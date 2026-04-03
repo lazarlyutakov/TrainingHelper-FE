@@ -1,0 +1,65 @@
+﻿<div class="page">
+
+  @if (loading()) {
+    <div class="loading-msg">Loading activity…</div>
+  } @else if (error()) {
+    <div class="error-msg">{{ error() }}</div>
+    <a routerLink="/dashboard" class="btn-outline">← Back to Dashboard</a>
+  } @else {
+    @let a = activity()!;
+
+    <div class="detail-header">
+      <a routerLink="/dashboard" class="back-link">← Back to Dashboard</a>
+      <div class="sport-badge">{{ a.sportType }}</div>
+    </div>
+
+    <h1 class="activity-title">{{ a.name }}</h1>
+    <p class="activity-date muted">{{ formatDate(a.startDateUtc) }}</p>
+
+    <!-- Primary metrics -->
+    <div class="cards">
+      <div class="card highlight">
+        <div class="card-label">Distance</div>
+        <div class="card-value">{{ km(a.distanceMeters) }} <span class="unit">km</span></div>
+      </div>
+      <div class="card highlight">
+        <div class="card-label">Moving Time</div>
+        <div class="card-value">{{ formatDuration(a.movingTimeSeconds) }}</div>
+      </div>
+      <div class="card highlight">
+        <div class="card-label">Elevation Gain</div>
+        <div class="card-value">{{ a.totalElevationGainMeters | number:'1.0-0' }} <span class="unit">m</span></div>
+      </div>
+      <div class="card highlight">
+        <div class="card-label">Avg Pace</div>
+        <div class="card-value">{{ pace(a.averageSpeedMetersPerSecond) }}</div>
+      </div>
+    </div>
+
+    <!-- Detail table -->
+    <h2>All Details</h2>
+    <table class="detail-table">
+      <tbody>
+        <tr><th>Sport Type</th><td>{{ a.sportType }}</td></tr>
+        <tr><th>Date</th><td>{{ formatDate(a.startDateUtc) }}</td></tr>
+        <tr><th>Distance</th><td>{{ km(a.distanceMeters) }} km</td></tr>
+        <tr><th>Moving Time</th><td>{{ formatDuration(a.movingTimeSeconds) }}</td></tr>
+        <tr><th>Elapsed Time</th><td>{{ formatDuration(a.elapsedTimeSeconds) }}</td></tr>
+        <tr><th>Elevation Gain</th><td>{{ a.totalElevationGainMeters | number:'1.0-0' }} m</td></tr>
+        <tr><th>Avg Speed</th><td>{{ speedKmh(a.averageSpeedMetersPerSecond) }} km/h</td></tr>
+        <tr><th>Max Speed</th><td>{{ speedKmh(a.maxSpeedMetersPerSecond) }} km/h</td></tr>
+        <tr><th>Avg Pace</th><td>{{ pace(a.averageSpeedMetersPerSecond) }}</td></tr>
+        <tr><th>Avg Heart Rate</th><td>{{ a.averageHeartRate != null ? (a.averageHeartRate | number:'1.0-0') + ' bpm' : '—' }}</td></tr>
+        <tr><th>Max Heart Rate</th><td>{{ a.maxHeartRate != null ? (a.maxHeartRate | number:'1.0-0') + ' bpm' : '—' }}</td></tr>
+        <tr><th>Calories</th><td>{{ calories(a.kilojoules) }}</td></tr>
+        <tr><th>View on Strava</th><td>
+          <a [attr.href]="stravaLink(a.stravaActivityId)" target="_blank" rel="noopener noreferrer">
+            Open on Strava ↗
+          </a>
+        </td></tr>
+      </tbody>
+    </table>
+  }
+
+</div>
+

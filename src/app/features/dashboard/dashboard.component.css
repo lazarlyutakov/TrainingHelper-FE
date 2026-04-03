@@ -118,3 +118,8 @@ tr:hover td { background: #fafafa; }
 .muted { color: #666; font-size: .9rem; }
 .loading-msg { color: #999; padding: 16px 0; font-size: .9rem; }
 
+/* Clickable activity rows */
+.clickable-row { cursor: pointer; }
+.clickable-row:hover { background: #fff8f5; }
+.clickable-row:hover .detail-link { color: #fc4c02; }
+.detail-link { color: #aaa; font-size: .85rem; white-space: nowrap; }

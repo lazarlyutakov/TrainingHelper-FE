@@ -5,12 +5,14 @@
   sportType: string;
   distanceMeters: number;
   movingTimeSeconds: number;
+  elapsedTimeSeconds: number;
   totalElevationGainMeters: number;
   startDateUtc: string;
   averageSpeedMetersPerSecond: number;
   maxSpeedMetersPerSecond: number;
   averageHeartRate: number | null;
   maxHeartRate: number | null;
+  kilojoules: number | null;
 }
 
 export interface Pagination {
@@ -24,4 +26,3 @@ export interface ActivitiesResponse {
   activities: Activity[];
   pagination: Pagination;
 }
-

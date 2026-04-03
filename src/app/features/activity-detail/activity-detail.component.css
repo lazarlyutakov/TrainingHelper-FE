@@ -1,0 +1,43 @@
+﻿.page { max-width: 860px; margin: 0 auto; padding: 24px 20px; font-family: Arial, sans-serif; }
+
+.detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.back-link { color: #fc4c02; text-decoration: none; font-size: .95rem; font-weight: 500; }
+.back-link:hover { text-decoration: underline; }
+
+.sport-badge {
+  background: #fc4c02; color: #fff;
+  padding: 4px 14px; border-radius: 20px; font-size: .85rem; font-weight: bold;
+}
+
+.activity-title { font-size: 1.7rem; margin: 0 0 4px; color: #222; }
+.activity-date { margin: 0 0 24px; }
+.muted { color: #666; }
+
+.cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+.card {
+  padding: 16px 20px; border: 1px solid #ddd; border-radius: 10px;
+  min-width: 160px; flex: 1;
+}
+.card.highlight { border-color: #fc4c02; }
+.card-label { font-size: .8rem; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+.card-value { font-size: 1.4rem; font-weight: bold; color: #222; }
+.unit { font-size: .9rem; font-weight: normal; color: #666; }
+
+h2 { margin: 0 0 12px; font-size: 1.1rem; color: #444; }
+
+.detail-table { width: 100%; border-collapse: collapse; }
+.detail-table th, .detail-table td {
+  padding: 10px 14px; border-bottom: 1px solid #eee; text-align: left;
+}
+.detail-table th { width: 200px; color: #555; font-weight: 600; background: #fafafa; }
+.detail-table td { color: #222; }
+.detail-table a { color: #fc4c02; text-decoration: none; }
+.detail-table a:hover { text-decoration: underline; }
+
+.loading-msg, .error-msg { padding: 40px; text-align: center; color: #888; font-size: 1.1rem; }
+.error-msg { color: #c0392b; }
+.btn-outline {
+  display: inline-block; margin-top: 16px; padding: 8px 16px;
+  border: 1px solid #ccc; border-radius: 6px; color: #555; text-decoration: none;
+}
+

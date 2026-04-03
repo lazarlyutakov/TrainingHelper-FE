@@ -2,7 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { StatsSummary } from '../models/stats.model';
-import { ActivitiesResponse } from '../models/activity.model';
+import { Activity, ActivitiesResponse } from '../models/activity.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -16,6 +16,10 @@ export class ApiService {
 
   getActivities(page: number): Observable<ActivitiesResponse> {
     return this.http.get<ActivitiesResponse>(`${this.base}/api/activities?take=${page}`);
+  }
+
+  getActivity(stravaActivityId: number): Observable<Activity> {
+    return this.http.get<Activity>(`${this.base}/api/activities/${stravaActivityId}`);
   }
 
   sync(athleteId: number, full = false): Observable<{ syncedCount: number; mode: string }> {
