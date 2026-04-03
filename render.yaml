@@ -3,7 +3,7 @@
 services:
   - type: static
     name: training-helper-fe
-    buildCommand: npm install && npm run build
+    buildCommand: npm run build:prod
     staticPublishPath: dist/training-helper-fe/browser
     routes:
       - type: rewrite
