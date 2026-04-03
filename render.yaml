@@ -4,7 +4,7 @@ services:
   - type: static
     name: training-helper-fe
     buildCommand: npm run build:prod
-    staticPublishPath: dist/training-helper-fe/browser
+    staticPublishPath: dist/app
     routes:
       - type: rewrite
         source: /*
