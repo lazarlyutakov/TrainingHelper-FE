@@ -1,0 +1,16 @@
+﻿# Node
+node_modules/
+npm-debug.log*
+
+# Angular build output
+dist/
+.angular/
+
+# Environment overrides (use environment.ts / environment.prod.ts)
+.env
+
+# IDE
+.idea/
+.vscode/
+*.suo
+

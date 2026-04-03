@@ -1,0 +1,89 @@
+﻿<div class="page">
+
+  <!-- Header -->
+  <div class="header-row">
+    <h1>🏃 Training Helper</h1>
+    <div class="header-right">
+      <span class="muted">Welcome, <strong>{{ auth.currentUser()?.displayName }}</strong></span>
+      <button class="btn-outline" (click)="auth.logout()">Log out</button>
+    </div>
+  </div>
+
+  <!-- Sync controls -->
+  <div class="sync-row">
+    <button class="btn" (click)="sync(false)" [disabled]="syncing()">Sync Data</button>
+    <button class="btn" (click)="sync(true)" [disabled]="syncing()">Full Re-sync</button>
+    <span class="muted">{{ syncStatus() }}</span>
+  </div>
+
+  <!-- Summary cards -->
+  @let s = stats();
+  @if (statsLoading()) {
+    <div class="loading-msg">Loading stats…</div>
+  } @else if (s) {
+    <div class="cards">
+      <div class="card"><div class="muted">Total Activities</div><strong>{{ s.totalActivities }}</strong></div>
+      <div class="card"><div class="muted">Total Distance (km)</div><strong>{{ km(s.totalDistanceMeters) }}</strong></div>
+      <div class="card"><div class="muted">Total Moving Time (h)</div><strong>{{ hours(s.totalMovingTimeSeconds) }}</strong></div>
+      <div class="card"><div class="muted">Last 30 Days Distance (km)</div><strong>{{ km(s.distanceLast30DaysMeters) }}</strong></div>
+      <div class="card"><div class="muted">Total Elevation Gain (m)</div><strong>{{ elevM(s.totalElevationGainMeters) }}</strong></div>
+    </div>
+
+    <!-- Sport split -->
+    <h2>Sport Split</h2>
+    <table>
+      <thead><tr><th>Sport</th><th>Activities</th><th>Distance (km)</th></tr></thead>
+      <tbody>
+        @for (item of s.bySport; track item.sportType) {
+          <tr>
+            <td>{{ item.sportType }}</td>
+            <td>{{ item.activityCount }}</td>
+            <td>{{ km(item.distanceMeters) }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="3" class="muted">No synced activities yet.</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  <!-- Recent activities -->
+  <h2>Recent Activities</h2>
+  @let pag = pagination();
+  @if (activitiesLoading()) {
+    <div class="loading-msg">Loading activities…</div>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Date (UTC)</th><th>Name</th><th>Sport</th>
+          <th>Distance (km)</th><th>Moving Time (min)</th><th>Elevation Gain (m)</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of activities(); track a.stravaActivityId) {
+          <tr>
+            <td>{{ formatDate(a.startDateUtc) }}</td>
+            <td>{{ a.name }}</td>
+            <td>{{ a.sportType }}</td>
+            <td>{{ km(a.distanceMeters) }}</td>
+            <td>{{ minutes(a.movingTimeSeconds) }}</td>
+            <td>{{ elevM(a.totalElevationGainMeters) }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="muted">No activities found.</td></tr>
+        }
+      </tbody>
+    </table>
+
+    @if ((pag?.totalPages ?? 0) > 1) {
+      <div class="pagination">
+        <button class="btn-sm" (click)="loadActivities(prevPage)" [disabled]="pag?.page === 1">← Prev</button>
+        <span class="current">Page {{ pag?.page }} of {{ pag?.totalPages }}</span>
+        <button class="btn-sm" (click)="loadActivities(nextPage)" [disabled]="pag?.page === pag?.totalPages">Next →</button>
+      </div>
+    }
+  }
+
+</div>
+
