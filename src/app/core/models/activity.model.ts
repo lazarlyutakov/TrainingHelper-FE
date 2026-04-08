@@ -26,3 +26,13 @@ export interface ActivitiesResponse {
   activities: Activity[];
   pagination: Pagination;
 }
+
+export interface ActivityFilters {
+  sportType?: string;
+  name?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
+}
+
