@@ -2,7 +2,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { StatsSummary } from '../models/stats.model';
-import { Activity, ActivitiesResponse, ActivityFilters } from '../models/activity.model';
+import { Activity, ActivitiesResponse, ActivityFilters, ComparisonActivity } from '../models/activity.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -31,6 +31,13 @@ export class ApiService {
 
   getActivity(stravaActivityId: number): Observable<Activity> {
     return this.http.get<Activity>(`${this.base}/api/activities/${stravaActivityId}`);
+  }
+
+  getComparisonActivities(sportType: string): Observable<ComparisonActivity[]> {
+    return this.http.get<ComparisonActivity[]>(
+      `${this.base}/api/activities/comparison`,
+      { params: new HttpParams().set('sportType', sportType) }
+    );
   }
 
   sync(athleteId: number, full = false): Observable<{ syncedCount: number; mode: string }> {

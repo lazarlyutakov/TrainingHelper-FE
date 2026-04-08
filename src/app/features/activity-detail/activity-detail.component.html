@@ -36,8 +36,54 @@
       </div>
     </div>
 
+    <!-- Progress vs same sport -->
+    <div class="section-header">
+      <h2>Progress vs Other {{ a.sportType }} Activities</h2>
+      @if (comparisonLoading()) {
+        <span class="muted loading-inline">Loading chart data…</span>
+      }
+    </div>
+
+    @if (!comparisonLoading() && comparison().length <= 1) {
+      <p class="muted chart-empty">Not enough {{ a.sportType }} activities to display a comparison (need at least 2).</p>
+    } @else {
+      <div class="charts-grid">
+        <!-- Pace chart -->
+        <div class="chart-card">
+          <div class="chart-title">
+            Pace over time
+            <span class="chart-hint">↓ lower = faster</span>
+          </div>
+          <div class="chart-legend-note">
+            <span class="dot dot-current"></span> This activity &nbsp;
+            <span class="dot dot-others"></span> Other activities &nbsp;
+            <span class="dot dot-trend"></span> Trend
+          </div>
+          <div class="chart-wrap">
+            <canvas id="paceChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Heart Rate chart -->
+        <div class="chart-card">
+          <div class="chart-title">
+            Avg Heart Rate over time
+            <span class="chart-hint">↓ lower at same pace = better fitness</span>
+          </div>
+          <div class="chart-legend-note">
+            <span class="dot dot-current"></span> This activity &nbsp;
+            <span class="dot dot-hr"></span> Other activities &nbsp;
+            <span class="dot dot-trend"></span> Trend
+          </div>
+          <div class="chart-wrap">
+            <canvas id="hrChart"></canvas>
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Detail table -->
-    <h2>All Details</h2>
+    <h2 class="details-h2">All Details</h2>
     <table class="detail-table">
       <tbody>
         <tr><th>Sport Type</th><td>{{ a.sportType }}</td></tr>

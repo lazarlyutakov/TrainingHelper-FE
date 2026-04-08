@@ -36,3 +36,12 @@ export interface ActivityFilters {
   sortDir?: 'asc' | 'desc';
 }
 
+export interface ComparisonActivity {
+  stravaActivityId: number;
+  name: string;
+  startDateUtc: string;
+  averageHeartRate: number | null;
+  averageSpeedMetersPerSecond: number;
+  distanceMeters: number;
+}
+
