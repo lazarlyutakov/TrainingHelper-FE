@@ -1,34 +1,69 @@
-﻿.page { max-width: 860px; margin: 0 auto; padding: 24px 20px; font-family: Arial, sans-serif; }
+﻿.page { max-width: 900px; margin: 0 auto; padding: 24px 20px; font-family: Arial, sans-serif; }
 
+/* ── Header & badge ──────────────────────────────────────────────────────── */
 .detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .back-link { color: #fc4c02; text-decoration: none; font-size: .95rem; font-weight: 500; }
 .back-link:hover { text-decoration: underline; }
-
-.sport-badge {
-  background: #fc4c02; color: #fff;
-  padding: 4px 14px; border-radius: 20px; font-size: .85rem; font-weight: bold;
-}
+.sport-badge { background: #fc4c02; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: .85rem; font-weight: bold; }
 
 .activity-title { font-size: 1.7rem; margin: 0 0 4px; color: #222; }
 .activity-date { margin: 0 0 24px; }
 .muted { color: #666; }
 
+/* ── Summary cards ───────────────────────────────────────────────────────── */
 .cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
-.card {
-  padding: 16px 20px; border: 1px solid #ddd; border-radius: 10px;
-  min-width: 160px; flex: 1;
-}
+.card { padding: 16px 20px; border: 1px solid #ddd; border-radius: 10px; min-width: 160px; flex: 1; }
 .card.highlight { border-color: #fc4c02; }
 .card-label { font-size: .8rem; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
 .card-value { font-size: 1.4rem; font-weight: bold; color: #222; }
 .unit { font-size: .9rem; font-weight: normal; color: #666; }
 
-h2 { margin: 0 0 12px; font-size: 1.1rem; color: #444; }
+/* ── Section header ──────────────────────────────────────────────────────── */
+.section-header { display: flex; align-items: baseline; gap: 12px; margin-top: 36px; margin-bottom: 10px; }
+.section-header h2 { margin: 0; font-size: 1.1rem; color: #333; }
+.loading-inline { font-size: .85rem; }
 
-.detail-table { width: 100%; border-collapse: collapse; }
-.detail-table th, .detail-table td {
-  padding: 10px 14px; border-bottom: 1px solid #eee; text-align: left;
+/* ── Period selector ─────────────────────────────────────────────────────── */
+.period-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.period-btn {
+  padding: 5px 14px; border: 1px solid #ccc; border-radius: 20px;
+  background: #fff; cursor: pointer; font-size: .83rem; color: #555;
+  transition: all .15s;
 }
+.period-btn:hover { border-color: #fc4c02; color: #fc4c02; }
+.period-btn.active { background: #fc4c02; border-color: #fc4c02; color: #fff; font-weight: 600; }
+.period-count { font-size: .8rem; margin-left: 6px; }
+
+/* ── Chart legend (shared across both charts) ────────────────────────────── */
+.chart-legend {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  font-size: .8rem; color: #555; margin-bottom: 10px;
+}
+.legend-hint { margin-left: auto; color: #aaa; font-style: italic; }
+
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 3px; vertical-align: middle; }
+.dot-current { background: #fc4c02; }
+.dot-others  { background: rgba(13,110,253,0.7); }
+.dot-trend   { background: rgba(80,80,80,0.5); border-radius: 2px; height: 3px; width: 16px; }
+
+.chart-empty { margin: 6px 0 28px; font-size: .9rem; }
+
+/* ── Charts grid ─────────────────────────────────────────────────────────── */
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 36px; }
+@media (max-width: 680px) { .charts-grid { grid-template-columns: 1fr; } }
+
+.chart-card {
+  background: #fff; border: 1px solid #e8e8e8; border-radius: 10px;
+  padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.chart-title { font-size: .88rem; font-weight: 600; color: #333; margin-bottom: 10px; }
+.chart-hint { font-size: .75rem; font-weight: normal; color: #999; margin-left: 6px; }
+.chart-wrap { position: relative; height: 240px; }
+
+/* ── Detail table ────────────────────────────────────────────────────────── */
+h2.details-h2 { margin: 8px 0 12px; font-size: 1.1rem; color: #444; }
+.detail-table { width: 100%; border-collapse: collapse; }
+.detail-table th, .detail-table td { padding: 10px 14px; border-bottom: 1px solid #eee; text-align: left; }
 .detail-table th { width: 200px; color: #555; font-weight: 600; background: #fafafa; }
 .detail-table td { color: #222; }
 .detail-table a { color: #fc4c02; text-decoration: none; }
@@ -36,81 +71,69 @@ h2 { margin: 0 0 12px; font-size: 1.1rem; color: #444; }
 
 .loading-msg, .error-msg { padding: 40px; text-align: center; color: #888; font-size: 1.1rem; }
 .error-msg { color: #c0392b; }
-.btn-outline {
-  display: inline-block; margin-top: 16px; padding: 8px 16px;
-  border: 1px solid #ccc; border-radius: 6px; color: #555; text-decoration: none;
-}
+.btn-outline { display: inline-block; margin-top: 16px; padding: 8px 16px; border: 1px solid #ccc; border-radius: 6px; color: #555; text-decoration: none; }
 
-/* ── Progress comparison charts ─────────────────────────────────────────── */
-.section-header {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-top: 36px;
-  margin-bottom: 4px;
-}
-.section-header h2 { margin: 0; }
-.loading-inline { font-size: .85rem; }
-
-.chart-empty { margin: 8px 0 28px; font-size: .9rem; }
-
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 36px;
-}
-@media (max-width: 700px) {
-  .charts-grid { grid-template-columns: 1fr; }
-}
-
-.chart-card {
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 10px;
+/* ── Modal overlay ───────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
   padding: 16px;
-  box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 
-.chart-title {
-  font-size: .95rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 2px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.chart-hint {
-  font-size: .75rem;
-  font-weight: normal;
-  color: #888;
-}
-
-.chart-legend-note {
-  font-size: .78rem;
-  color: #666;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  flex-wrap: wrap;
-}
-
-.dot {
-  display: inline-block;
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  margin-right: 2px;
-}
-.dot-current { background: #fc4c02; }
-.dot-others  { background: rgba(13,110,253,0.75); }
-.dot-hr      { background: rgba(220,53,69,0.75); }
-.dot-trend   { background: rgba(100,100,100,0.55); width: 16px; border-radius: 2px; height: 3px; }
-
-.chart-wrap {
+.modal-card {
+  background: #fff; border-radius: 14px;
+  padding: 28px 28px 24px;
+  width: 100%; max-width: 500px;
   position: relative;
-  height: 260px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: modal-in .18s ease-out;
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0);   }
 }
 
-.details-h2 { margin-top: 8px; }
+.modal-close {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none; font-size: 1.1rem;
+  cursor: pointer; color: #999; line-height: 1;
+  padding: 4px 6px; border-radius: 4px;
+}
+.modal-close:hover { background: #f0f0f0; color: #333; }
+
+.modal-sport-badge {
+  display: inline-block; background: #fc4c02; color: #fff;
+  padding: 3px 12px; border-radius: 20px; font-size: .78rem; font-weight: bold;
+  margin-bottom: 8px;
+}
+.modal-title { font-size: 1.25rem; font-weight: bold; color: #111; margin: 0 0 4px; padding-right: 32px; }
+.modal-date  { font-size: .85rem; margin: 0 0 18px; }
+
+.modal-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px 8px; margin-bottom: 22px;
+}
+@media (max-width: 420px) { .modal-stats { grid-template-columns: repeat(2, 1fr); } }
+
+.modal-stat { text-align: center; }
+.modal-stat-label { font-size: .72rem; color: #888; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+.modal-stat-value { font-size: 1rem; font-weight: bold; color: #222; }
+
+.modal-actions { display: flex; gap: 10px; }
+.btn-primary {
+  flex: 1; padding: 10px 16px; background: #fc4c02; color: #fff;
+  border-radius: 8px; text-align: center; text-decoration: none;
+  font-size: .9rem; font-weight: 600;
+}
+.btn-primary:hover { background: #e04400; }
+.btn-strava {
+  padding: 10px 16px; border: 1px solid #fc4c02; color: #fc4c02;
+  border-radius: 8px; text-decoration: none; font-size: .9rem;
+  white-space: nowrap;
+}
+.btn-strava:hover { background: #fff5f2; }
+
+.modal-loading { padding: 48px; text-align: center; color: #999; }

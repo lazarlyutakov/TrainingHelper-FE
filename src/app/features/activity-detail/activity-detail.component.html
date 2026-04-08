@@ -36,50 +36,52 @@
       </div>
     </div>
 
-    <!-- Progress vs same sport -->
+    <!-- ── Progress comparison section ──────────────────────────────────── -->
     <div class="section-header">
       <h2>Progress vs Other {{ a.sportType }} Activities</h2>
       @if (comparisonLoading()) {
-        <span class="muted loading-inline">Loading chart data…</span>
+        <span class="muted loading-inline">Loading…</span>
       }
     </div>
 
-    @if (!comparisonLoading() && comparison().length <= 1) {
-      <p class="muted chart-empty">Not enough {{ a.sportType }} activities to display a comparison (need at least 2).</p>
-    } @else {
-      <div class="charts-grid">
-        <!-- Pace chart -->
-        <div class="chart-card">
-          <div class="chart-title">
-            Pace over time
-            <span class="chart-hint">↓ lower = faster</span>
-          </div>
-          <div class="chart-legend-note">
-            <span class="dot dot-current"></span> This activity &nbsp;
-            <span class="dot dot-others"></span> Other activities &nbsp;
-            <span class="dot dot-trend"></span> Trend
-          </div>
-          <div class="chart-wrap">
-            <canvas id="paceChart"></canvas>
-          </div>
+    @if (!comparisonLoading()) {
+      <!-- Period selector -->
+      <div class="period-bar">
+        @for (p of periods; track p.value) {
+          <button class="period-btn"
+                  [class.active]="selectedPeriod() === p.value"
+                  (click)="setPeriod(p.value)">
+            {{ p.label }}
+          </button>
+        }
+        <span class="period-count muted">{{ filteredCount() }} activities</span>
+      </div>
+
+      @if (filteredCount() < 2) {
+        <p class="muted chart-empty">
+          Not enough {{ a.sportType }} activities in this period to display a comparison.
+          Try a wider range.
+        </p>
+      } @else {
+        <!-- Chart legend -->
+        <div class="chart-legend">
+          <span><span class="dot dot-current"></span> This activity</span>
+          <span><span class="dot dot-others"></span> Other activities</span>
+          <span><span class="dot dot-trend"></span> Trend</span>
+          <span class="legend-hint">Click any dot to preview that activity</span>
         </div>
 
-        <!-- Heart Rate chart -->
-        <div class="chart-card">
-          <div class="chart-title">
-            Avg Heart Rate over time
-            <span class="chart-hint">↓ lower at same pace = better fitness</span>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-title">Pace over time <span class="chart-hint">↓ lower = faster</span></div>
+            <div class="chart-wrap"><canvas id="paceChart"></canvas></div>
           </div>
-          <div class="chart-legend-note">
-            <span class="dot dot-current"></span> This activity &nbsp;
-            <span class="dot dot-hr"></span> Other activities &nbsp;
-            <span class="dot dot-trend"></span> Trend
-          </div>
-          <div class="chart-wrap">
-            <canvas id="hrChart"></canvas>
+          <div class="chart-card">
+            <div class="chart-title">Heart Rate over time <span class="chart-hint">↓ lower = better fitness</span></div>
+            <div class="chart-wrap"><canvas id="hrChart"></canvas></div>
           </div>
         </div>
-      </div>
+      }
     }
 
     <!-- Detail table -->
@@ -99,9 +101,7 @@
         <tr><th>Max Heart Rate</th><td>{{ a.maxHeartRate != null ? (a.maxHeartRate | number:'1.0-0') + ' bpm' : '—' }}</td></tr>
         <tr><th>Calories</th><td>{{ calories(a.kilojoules) }}</td></tr>
         <tr><th>View on Strava</th><td>
-          <a [attr.href]="stravaLink(a.stravaActivityId)" target="_blank" rel="noopener noreferrer">
-            Open on Strava ↗
-          </a>
+          <a [attr.href]="stravaLink(a.stravaActivityId)" target="_blank" rel="noopener noreferrer">Open on Strava ↗</a>
         </td></tr>
       </tbody>
     </table>
@@ -109,3 +109,65 @@
 
 </div>
 
+<!-- ── Activity popup modal ──────────────────────────────────────────────── -->
+@if (popupOpen()) {
+  <div class="modal-overlay" (click)="closePopup()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <button class="modal-close" (click)="closePopup()">✕</button>
+
+      @if (popupLoading()) {
+        <div class="modal-loading">Loading activity…</div>
+      } @else if (popupActivity()) {
+        @let p = popupActivity()!;
+        <div class="modal-sport-badge">{{ p.sportType }}</div>
+        <h3 class="modal-title">{{ p.name }}</h3>
+        <p class="modal-date muted">{{ formatDate(p.startDateUtc) }}</p>
+
+        <div class="modal-stats">
+          <div class="modal-stat">
+            <div class="modal-stat-label">Distance</div>
+            <div class="modal-stat-value">{{ km(p.distanceMeters) }} km</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-label">Moving Time</div>
+            <div class="modal-stat-value">{{ formatDuration(p.movingTimeSeconds) }}</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-label">Avg Pace</div>
+            <div class="modal-stat-value">{{ pace(p.averageSpeedMetersPerSecond) }}</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-label">Elevation</div>
+            <div class="modal-stat-value">{{ p.totalElevationGainMeters | number:'1.0-0' }} m</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-label">Avg HR</div>
+            <div class="modal-stat-value">{{ p.averageHeartRate != null ? (p.averageHeartRate | number:'1.0-0') + ' bpm' : '—' }}</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-label">Max HR</div>
+            <div class="modal-stat-value">{{ p.maxHeartRate != null ? (p.maxHeartRate | number:'1.0-0') + ' bpm' : '—' }}</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-label">Calories</div>
+            <div class="modal-stat-value">{{ calories(p.kilojoules) }}</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-label">Max Speed</div>
+            <div class="modal-stat-value">{{ speedKmh(p.maxSpeedMetersPerSecond) }} km/h</div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <a [routerLink]="['/activities', p.stravaActivityId]" class="btn-primary" (click)="closePopup()">
+            Open full detail →
+          </a>
+          <a [attr.href]="stravaLink(p.stravaActivityId)" target="_blank" rel="noopener noreferrer" class="btn-strava">
+            View on Strava ↗
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+}
