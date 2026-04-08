@@ -54,8 +54,12 @@
   <div class="filter-bar">
     <div class="filter-group">
       <label class="filter-label">Sport type</label>
-      <input class="filter-input" type="text" placeholder="e.g. Run, Ride…"
-             [(ngModel)]="filterSportType" (keyup.enter)="applyFilters()" />
+      <select class="filter-input" [(ngModel)]="filterSportType">
+        <option value="">All sports</option>
+        @for (st of sportTypes(); track st) {
+          <option [value]="st">{{ st }}</option>
+        }
+      </select>
     </div>
     <div class="filter-group">
       <label class="filter-label">Activity name</label>

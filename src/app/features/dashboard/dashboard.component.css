@@ -160,6 +160,8 @@ tr:hover td { background: #fafafa; }
   width: 160px;
   outline: none;
   transition: border-color .15s;
+  background: #fff;
+  appearance: auto;
 }
 .filter-input:focus { border-color: #fc4c02; }
 

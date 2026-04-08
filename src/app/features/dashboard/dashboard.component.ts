@@ -34,6 +34,7 @@ export class DashboardComponent implements OnInit {
   syncing = signal<boolean>(false);
   statsLoading = signal<boolean>(true);
   activitiesLoading = signal<boolean>(true);
+  sportTypes = signal<string[]>([]);
 
   // Filter state
   filterSportType = '';
@@ -48,6 +49,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.loadStats();
     this.loadActivities(1);
+    this.api.getSportTypes().subscribe({ next: t => this.sportTypes.set(t) });
   }
 
   loadStats(): void {
@@ -116,7 +118,11 @@ export class DashboardComponent implements OnInit {
       next: res => {
         this.syncStatus.set(`${res.mode} sync loaded ${res.syncedCount} activities.`);
         this.syncing.set(false);
-        setTimeout(() => { this.loadStats(); this.loadActivities(1); }, 500);
+        setTimeout(() => {
+          this.loadStats();
+          this.loadActivities(1);
+          this.api.getSportTypes().subscribe({ next: t => this.sportTypes.set(t) });
+        }, 500);
       },
       error: () => {
         this.syncStatus.set('Sync failed.');

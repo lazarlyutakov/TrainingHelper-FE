@@ -14,6 +14,10 @@ export class ApiService {
     return this.http.get<StatsSummary>(`${this.base}/api/stats/summary`);
   }
 
+  getSportTypes(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.base}/api/activities/sport-types`);
+  }
+
   getActivities(page: number, filters: ActivityFilters = {}): Observable<ActivitiesResponse> {
     let params = new HttpParams().set('take', page.toString());
     if (filters.sportType) params = params.set('sportType', filters.sportType);
