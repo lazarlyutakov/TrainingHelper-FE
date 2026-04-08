@@ -126,6 +126,9 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   // ── Chart building ────────────────────────────────────────────────────────
   private buildCharts(current: Activity, all: ComparisonActivity[]): void {
     const currentId = current.stravaActivityId;
+    const swim      = this.isSwim(current.sportType);
+    const base      = swim ? 100 : 1000;
+    const unit      = swim ? 'min/100m' : 'min/km';
 
     const hrData = all.filter(a => a.averageHeartRate != null);
     this.hrChart = this.buildChart(
@@ -143,10 +146,10 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     const paceData = all.filter(a => a.averageSpeedMetersPerSecond > 0);
     this.paceChart = this.buildChart(
       'paceChart', this.paceChart,
-      'Avg Pace (min/km)', currentId,
+      `Avg Pace (${unit})`, currentId,
       paceData.map(a => ({
         x: new Date(a.startDateUtc).getTime(),
-        y: parseFloat((1000 / a.averageSpeedMetersPerSecond / 60).toFixed(3)),
+        y: parseFloat((base / a.averageSpeedMetersPerSecond / 60).toFixed(3)),
         id: a.stravaActivityId,
         label: this.shortDate(a.startDateUtc) + ' – ' + a.name
       })),
@@ -172,12 +175,14 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     const trend        = this.linearRegression(points);
     const currentPt    = points.find(p => p.id === currentId);
 
-    const isPace = label.includes('Pace');
+    const isPace   = label.includes('Pace');
+    // Extract unit from label: "Avg Pace (min/100m)" → "/100m",  "Avg Pace (min/km)" → "/km"
+    const paceUnit = label.includes('100m') ? '/100m' : '/km';
 
     const formatVal = (val: number): string => {
       if (isPace) {
         const m = Math.floor(val); const s = Math.round((val - m) * 60);
-        return `${m}:${s.toString().padStart(2, '0')} /km`;
+        return `${m}:${s.toString().padStart(2, '0')} ${paceUnit}`;
       }
       return `${val.toFixed(0)} bpm`;
     };
@@ -283,8 +288,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
             ticks: {
               callback: (v: string | number) => isPace
                 ? (() => { const m = Math.floor(+v); const s = Math.round((+v - m) * 60); return `${m}:${s.toString().padStart(2, '0')}`; })()
-                : `${v}`,
-              maxTicksLimit: 6,
+                : `${v}`,              maxTicksLimit: 6,
               font: { size: 10 }
             },
             grid: { color: 'rgba(0,0,0,0.04)' }
@@ -312,11 +316,20 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   }
 
   // ── Template helpers ──────────────────────────────────────────────────────
+  isSwim(sportType: string): boolean {
+    return sportType.toLowerCase().includes('swim');
+  }
+
+  /** Distance base for pace: 100 m for swimming, 1000 m (1 km) for everything else. */
+  private paceBase(sportType: string): number { return this.isSwim(sportType) ? 100 : 1000; }
+  private paceUnit(sportType: string): string  { return this.isSwim(sportType) ? '/100m' : '/km'; }
+
   km(m: number): string { return (m / 1000).toFixed(2); }
-  pace(speedMs: number): string {
+
+  pace(speedMs: number, sportType = ''): string {
     if (!speedMs) return '—';
-    const s = 1000 / speedMs;
-    return `${Math.floor(s / 60)}:${Math.round(s % 60).toString().padStart(2, '0')} /km`;
+    const secPer = this.paceBase(sportType) / speedMs;
+    return `${Math.floor(secPer / 60)}:${Math.round(secPer % 60).toString().padStart(2, '0')} ${this.paceUnit(sportType)}`;
   }
   speedKmh(ms: number): string { return (ms * 3.6).toFixed(1); }
   formatDuration(seconds: number): string {

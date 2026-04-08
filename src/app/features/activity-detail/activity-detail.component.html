@@ -32,7 +32,7 @@
       </div>
       <div class="card highlight">
         <div class="card-label">Avg Pace</div>
-        <div class="card-value">{{ pace(a.averageSpeedMetersPerSecond) }}</div>
+        <div class="card-value">{{ pace(a.averageSpeedMetersPerSecond, a.sportType) }}</div>
       </div>
     </div>
 
@@ -96,7 +96,7 @@
         <tr><th>Elevation Gain</th><td>{{ a.totalElevationGainMeters | number:'1.0-0' }} m</td></tr>
         <tr><th>Avg Speed</th><td>{{ speedKmh(a.averageSpeedMetersPerSecond) }} km/h</td></tr>
         <tr><th>Max Speed</th><td>{{ speedKmh(a.maxSpeedMetersPerSecond) }} km/h</td></tr>
-        <tr><th>Avg Pace</th><td>{{ pace(a.averageSpeedMetersPerSecond) }}</td></tr>
+        <tr><th>Avg Pace</th><td>{{ pace(a.averageSpeedMetersPerSecond, a.sportType) }}</td></tr>
         <tr><th>Avg Heart Rate</th><td>{{ a.averageHeartRate != null ? (a.averageHeartRate | number:'1.0-0') + ' bpm' : '—' }}</td></tr>
         <tr><th>Max Heart Rate</th><td>{{ a.maxHeartRate != null ? (a.maxHeartRate | number:'1.0-0') + ' bpm' : '—' }}</td></tr>
         <tr><th>Calories</th><td>{{ calories(a.kilojoules) }}</td></tr>
@@ -135,7 +135,7 @@
           </div>
           <div class="modal-stat">
             <div class="modal-stat-label">Avg Pace</div>
-            <div class="modal-stat-value">{{ pace(p.averageSpeedMetersPerSecond) }}</div>
+            <div class="modal-stat-value">{{ pace(p.averageSpeedMetersPerSecond, p.sportType) }}</div>
           </div>
           <div class="modal-stat">
             <div class="modal-stat-label">Elevation</div>
