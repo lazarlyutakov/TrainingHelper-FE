@@ -17,6 +17,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/activity-detail/activity-detail.component').then(m => m.ActivityDetailComponent),
     canActivate: [authGuard]
   },
+  {
+    path: 'coaching',
+    loadComponent: () => import('./features/coaching/coaching.component').then(m => m.CoachingComponent),
+    canActivate: [authGuard]
+  },
   { path: '**', redirectTo: 'dashboard' }
 ];
 

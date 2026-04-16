@@ -1,0 +1,175 @@
+﻿<div class="page">
+
+  <!-- Header -->
+  <div class="header-row">
+    <a routerLink="/dashboard" class="back-link">← Dashboard</a>
+    <h1>🧠 Training Coach</h1>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-row">
+    <div class="control-group">
+      <label>Framework</label>
+      <select [(ngModel)]="selectedFramework">
+        @for (f of frameworks(); track f.id) {
+          <option [value]="f.id">{{ f.label }}</option>
+        }
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Plan Weeks</label>
+      <select [(ngModel)]="planWeeks">
+        <option [value]="4">4 weeks</option>
+        <option [value]="6">6 weeks</option>
+        <option [value]="8">8 weeks</option>
+        <option [value]="10">10 weeks</option>
+        <option [value]="12">12 weeks</option>
+      </select>
+    </div>
+    <button class="btn" (click)="loadAnalysis()" [disabled]="loading()">
+      {{ loading() ? 'Analyzing…' : 'Analyze' }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-msg">⏳ Running training analysis…</div>
+  } @else if (error()) {
+    <div class="error-msg">{{ error() }}</div>
+  } @else {
+    @let a = analysis();
+    @if (a) {
+
+    <!-- Current Load (PMC) -->
+    <section class="section">
+      <h2>📊 Current Load</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="muted">Fitness (CTL)</div>
+          <strong>{{ round0(a.currentLoad.ctl) }}</strong>
+        </div>
+        <div class="card">
+          <div class="muted">Fatigue (ATL)</div>
+          <strong>{{ round0(a.currentLoad.atl) }}</strong>
+        </div>
+        <div class="card" [class]="tsbClass(a.currentLoad.tsb)">
+          <div class="muted">Form (TSB)</div>
+          <strong>{{ round0(a.currentLoad.tsb) }}</strong>
+          <small>{{ a.currentLoad.formLabel }}</small>
+        </div>
+        @if (a.currentLoad.suggestRecoveryWeek) {
+          <div class="card card-warn">
+            <div class="muted">Recommendation</div>
+            <strong>💤 Recovery week suggested</strong>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- VO2 Trends -->
+    @if (a.vo2Trends.length > 0) {
+      <section class="section">
+        <h2>🫁 VO₂ Trends</h2>
+        <div class="cards">
+          @for (v of a.vo2Trends; track v.sportType) {
+            <div class="card">
+              <div class="muted">{{ v.sportType }}</div>
+              <strong>{{ v.estimatedVo2Max != null ? round1(v.estimatedVo2Max) : '—' }} ml/kg/min</strong>
+              <small>{{ v.trendLabel }}</small>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Intensity Distribution -->
+    @if (a.intensityDistribution.length > 0) {
+      <section class="section">
+        <h2>⚡ Intensity Distribution</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Sport</th>
+              <th>Easy %</th>
+              <th>Moderate %</th>
+              <th>Hard %</th>
+              <th>Activities</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of a.intensityDistribution; track d.sportType) {
+              <tr>
+                <td>{{ d.sportType }}</td>
+                <td>{{ round0(d.easyPercent) }}%</td>
+                <td>{{ round0(d.moderatePercent) }}%</td>
+                <td>{{ round0(d.hardPercent) }}%</td>
+                <td>{{ d.activitiesAnalyzed }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
+
+    <!-- Insights -->
+    @if (a.insights.length > 0) {
+      <section class="section">
+        <h2>💡 Insights</h2>
+        <ul class="insights-list">
+          @for (insight of a.insights; track insight) {
+            <li>{{ insight }}</li>
+          }
+        </ul>
+      </section>
+    }
+
+    <!-- AI Coaching Summary -->
+    @if (a.aiCoachingSummary) {
+      <section class="section ai-section">
+        <h2>🤖 AI Coaching Summary</h2>
+        <p class="ai-text">{{ a.aiCoachingSummary }}</p>
+      </section>
+    }
+
+    <!-- Suggested Plan -->
+    @if (a.suggestedPlan) {
+      <section class="section">
+        <h2>📅 {{ a.suggestedPlan.frameworkLabel }} Plan</h2>
+        <p class="plan-goal">{{ a.suggestedPlan.goal }}</p>
+        <p class="muted small">{{ formatDate(a.suggestedPlan.planStart) }} – {{ formatDate(a.suggestedPlan.planEnd) }}</p>
+
+        @for (week of a.suggestedPlan.weeks; track week.weekNumber) {
+          <details class="week-block">
+            <summary>
+              <strong>Week {{ week.weekNumber }}: {{ week.weekLabel }}</strong>
+              <span class="muted"> — {{ week.focus }}</span>
+              <span class="week-meta">{{ km(week.totalTargetDistanceMeters) }} km · TSS {{ round0(week.plannedTss) }}</span>
+            </summary>
+            <table class="workout-table">
+              <thead>
+                <tr><th>Date</th><th>Type</th><th>Description</th><th>Dist (km)</th><th>Duration</th><th>Pace</th></tr>
+              </thead>
+              <tbody>
+                @for (w of week.workouts; track w.date + w.type) {
+                  <tr [class.rest-row]="w.type === 'Rest'">
+                    <td>{{ formatDate(w.date) }}</td>
+                    <td>{{ w.type }}</td>
+                    <td>{{ w.description }}</td>
+                    <td>{{ w.targetDistanceMeters != null ? km(w.targetDistanceMeters) : '—' }}</td>
+                    <td>{{ w.targetDurationMinutes != null ? w.targetDurationMinutes + ' min' : '—' }}</td>
+                    <td>{{ w.paceGuidance ?? '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </details>
+        }
+      </section>
+    }
+
+    }
+  }
+
+</div>
+
+
+

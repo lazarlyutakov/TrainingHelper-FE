@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { StatsSummary } from '../models/stats.model';
 import { Activity, ActivitiesResponse, ActivityFilters, ComparisonActivity } from '../models/activity.model';
+import { TrainingAnalysis, PlanFramework } from '../models/training.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -38,6 +39,20 @@ export class ApiService {
       `${this.base}/api/activities/comparison`,
       { params: new HttpParams().set('sportType', sportType) }
     );
+  }
+
+  getTrainingAnalysis(planWeeks = 8, framework = 'Polarized8020'): Observable<TrainingAnalysis> {
+    const params = new HttpParams().set('planWeeks', planWeeks).set('framework', framework);
+    return this.http.get<TrainingAnalysis>(`${this.base}/api/training/analysis`, { params });
+  }
+
+  getTrainingFrameworks(): Observable<PlanFramework[]> {
+    return this.http.get<PlanFramework[]>(`${this.base}/api/training/frameworks`);
+  }
+
+  getActivityCoaching(stravaActivityId: number, planWeeks = 8, framework = 'Polarized8020'): Observable<any> {
+    const params = new HttpParams().set('planWeeks', planWeeks).set('framework', framework);
+    return this.http.get<any>(`${this.base}/api/activities/${stravaActivityId}/coaching`, { params });
   }
 
   sync(athleteId: number, full = false): Observable<{ syncedCount: number; mode: string }> {
