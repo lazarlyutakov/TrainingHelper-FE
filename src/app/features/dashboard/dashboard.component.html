@@ -108,7 +108,14 @@
             <td>{{ minutes(a.movingTimeSeconds) }}</td>
             <td>{{ elevM(a.totalElevationGainMeters) }}</td>
             <td>
-              <a class="view-link" [attr.href]="activityUrl(a.id)" target="_blank" rel="noopener noreferrer">View →</a>
+              <a
+                class="view-link"
+                [attr.href]="activityUrl(a.id)"
+                target="_blank"
+                rel="noopener noreferrer"
+                (click)="onViewClick($event, a.id)">
+                View →
+              </a>
             </td>
           </tr>
         } @empty {

@@ -155,6 +155,12 @@ export class DashboardComponent implements OnInit {
     window.open(this.activityUrl(id), '_blank', 'noopener');
   }
 
+  onViewClick(event: MouseEvent, id: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.openActivityInNewTab(id);
+  }
+
   get prevPage(): number { return Math.max(1, (this.pagination()?.page ?? 1) - 1); }
   get nextPage(): number {
     const p = this.pagination();
