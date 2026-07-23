@@ -1,5 +1,7 @@
 ﻿export interface Activity {
-  stravaActivityId: number;
+  id: number;
+  stravaActivityId: number | null;
+  source?: string;
   athleteId: number;
   name: string;
   sportType: string;
@@ -37,7 +39,9 @@ export interface ActivityFilters {
 }
 
 export interface ComparisonActivity {
-  stravaActivityId: number;
+  id: number;
+  stravaActivityId: number | null;
+  source?: string;
   name: string;
   startDateUtc: string;
   averageHeartRate: number | null;

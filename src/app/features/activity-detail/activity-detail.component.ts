@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { Activity, ComparisonActivity } from '../../core/models/activity.model';
+import { ActivityCoachingResponse, ActivityDetail } from '../../core/models/activity-detail.model';
 import {
   Chart, LineController, ScatterController,
   LinearScale, PointElement, LineElement,
@@ -37,15 +38,17 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  activity          = signal<Activity | null>(null);
+  activity          = signal<ActivityDetail | null>(null);
   allComparison     = signal<ComparisonActivity[]>([]);
+  coaching          = signal<ActivityCoachingResponse | null>(null);
   loading           = signal<boolean>(true);
   comparisonLoading = signal<boolean>(false);
+  coachingLoading   = signal<boolean>(false);
   error             = signal<string | null>(null);
   selectedPeriod    = signal<Period>('1Y');
 
   // ── Popup state ───────────────────────────────────────────────────────────
-  popupActivity  = signal<Activity | null>(null);
+  popupActivity  = signal<ActivityDetail | null>(null);
   popupLoading   = signal<boolean>(false);
   popupOpen      = signal<boolean>(false);
 
@@ -75,8 +78,12 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
         this.activity.set(a);
         this.loading.set(false);
         this.loadComparison(a.sportType);
+        this.loadCoaching(id);
       },
-      error: () => { this.error.set('Activity not found.'); this.loading.set(false); }
+      error: err => {
+        this.error.set(this.resolveActivityError(err));
+        this.loading.set(false);
+      }
     });
   }
 
@@ -89,8 +96,37 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     this.comparisonLoading.set(true);
     this.api.getComparisonActivities(sportType).subscribe({
       next: c => { this.allComparison.set(c); this.comparisonLoading.set(false); },
-      error: () => this.comparisonLoading.set(false)
+      error: err => {
+        if ((err as { status?: number } | null)?.status === 401) {
+          this.router.navigate(['/login']);
+          return;
+        }
+        this.comparisonLoading.set(false);
+      }
     });
+  }
+
+  private loadCoaching(id: number): void {
+    this.coachingLoading.set(true);
+    this.api.getActivityCoaching(id).subscribe({
+      next: c => {
+        this.coaching.set(c);
+        this.coachingLoading.set(false);
+      },
+      error: err => {
+        if ((err as { status?: number } | null)?.status === 401) {
+          this.router.navigate(['/login']);
+          return;
+        }
+        this.coaching.set(null);
+        this.coachingLoading.set(false);
+      }
+    });
+  }
+
+  openActivityInNewTab(id: number): void {
+    const url = this.router.serializeUrl(this.router.createUrlTree(['/activities', id]));
+    window.open(url, '_blank', 'noopener');
   }
 
   setPeriod(period: Period): void { this.selectedPeriod.set(period); }
@@ -125,7 +161,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
 
   // ── Chart building ────────────────────────────────────────────────────────
   private buildCharts(current: Activity, all: ComparisonActivity[]): void {
-    const currentId = current.stravaActivityId;
+    const currentId = current.id;
     const swim      = this.isSwim(current.sportType);
     const base      = swim ? 100 : 1000;
     const unit      = swim ? 'min/100m' : 'min/km';
@@ -137,7 +173,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
       hrData.map(a => ({
         x: new Date(a.startDateUtc).getTime(),
         y: a.averageHeartRate as number,
-        id: a.stravaActivityId,
+        id: a.id,
         label: this.shortDate(a.startDateUtc) + ' – ' + a.name
       })),
       'rgba(220,53,69,0.7)', false
@@ -150,7 +186,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
       paceData.map(a => ({
         x: new Date(a.startDateUtc).getTime(),
         y: parseFloat((base / a.averageSpeedMetersPerSecond / 60).toFixed(3)),
-        id: a.stravaActivityId,
+        id: a.id,
         label: this.shortDate(a.startDateUtc) + ' – ' + a.name
       })),
       'rgba(13,110,253,0.7)', true
@@ -242,9 +278,9 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
           // dataset 0 → other activities; dataset 1 → current activity
           if (el.datasetIndex === 0) {
             const pt = points[el.index];
-            if (pt) this.openActivityPopup(pt.id);
+            if (pt) this.openActivityInNewTab(pt.id);
           } else if (el.datasetIndex === 1) {
-            this.openActivityPopup(currentId);
+            this.openActivityInNewTab(currentId);
           }
         },
         onHover: (_evt: ChartEvent, elements: ActiveElement[], chart: Chart) => {
@@ -315,6 +351,16 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' });
   }
 
+  private resolveActivityError(error: unknown): string {
+    const status = (error as { status?: number } | null)?.status;
+    if (status === 404) return 'Activity not found.';
+    if (status === 401) {
+      this.router.navigate(['/login']);
+      return 'Your session expired. Please log in again.';
+    }
+    return 'Failed to load activity.';
+  }
+
   // ── Template helpers ──────────────────────────────────────────────────────
   isSwim(sportType: string): boolean {
     return sportType.toLowerCase().includes('swim');
@@ -325,6 +371,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   private paceUnit(sportType: string): string  { return this.isSwim(sportType) ? '/100m' : '/km'; }
 
   km(m: number): string { return (m / 1000).toFixed(2); }
+  round0(n: number): string { return n.toFixed(0); }
 
   pace(speedMs: number, sportType = ''): string {
     if (!speedMs) return '—';
@@ -343,7 +390,13 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     if (kj == null) return '—';
     return `${Math.round(kj * 0.239006)} kcal (${kj.toFixed(0)} kJ)`;
   }
-  stravaLink(id: number): string { return 'https://www.strava.com/activities/' + id; }
+  stravaLink(id: number | null): string { return id == null ? '' : 'https://www.strava.com/activities/' + id; }
+
+  sourceLabel(source: ActivityDetail['source']): string {
+    if (source === 'GpxImport') return 'GPX Import';
+    if (source === 'CsvImport') return 'CSV Import';
+    return 'Strava';
+  }
 }
 
 

@@ -3,8 +3,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { StatsSummary } from '../models/stats.model';
 import { Activity, ActivitiesResponse, ActivityFilters, ComparisonActivity } from '../models/activity.model';
+import { ActivityCoachingResponse, ActivityDetail } from '../models/activity-detail.model';
 import { TrainingAnalysis, PlanFramework } from '../models/training.model';
-import { ImportSummary } from '../models/import.model';
+import { ImportSummary } from '../models/activity-import.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -34,8 +35,8 @@ export class ApiService {
     return this.http.get<ActivitiesResponse>(`${this.base}/api/activities`, { params });
   }
 
-  getActivity(stravaActivityId: number): Observable<Activity> {
-    return this.http.get<Activity>(`${this.base}/api/activities/${stravaActivityId}`);
+  getActivity(id: number): Observable<ActivityDetail> {
+    return this.http.get<ActivityDetail>(`${this.base}/api/activities/id/${id}`);
   }
 
   getComparisonActivities(sportType: string): Observable<ComparisonActivity[]> {
@@ -54,9 +55,9 @@ export class ApiService {
     return this.http.get<PlanFramework[]>(`${this.base}/api/training/frameworks`);
   }
 
-  getActivityCoaching(stravaActivityId: number, planWeeks = 8, framework = 'Polarized8020'): Observable<any> {
+  getActivityCoaching(id: number, planWeeks = 8, framework = 'Polarized8020'): Observable<ActivityCoachingResponse> {
     const params = new HttpParams().set('planWeeks', planWeeks).set('framework', framework);
-    return this.http.get<any>(`${this.base}/api/activities/${stravaActivityId}/coaching`, { params });
+    return this.http.get<ActivityCoachingResponse>(`${this.base}/api/activities/id/${id}/coaching`, { params });
   }
 
   sync(athleteId: number, full = false): Observable<{ syncedCount: number; mode: string }> {

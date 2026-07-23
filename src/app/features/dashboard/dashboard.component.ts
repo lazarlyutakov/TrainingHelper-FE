@@ -2,7 +2,7 @@
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
 import { StatsSummary } from '../../core/models/stats.model';
@@ -27,6 +27,7 @@ const SORT_COLUMNS = [
 export class DashboardComponent implements OnInit {
   protected auth = inject(AuthService);
   private api = inject(ApiService);
+  private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
   stats = signal<StatsSummary | null>(null);
@@ -145,6 +146,14 @@ export class DashboardComponent implements OnInit {
   minutes(seconds: number): string { return (seconds / 60).toFixed(1); }
   elevM(meters: number): number { return Math.round(meters); }
   formatDate(iso: string): string { return new Date(iso).toLocaleString(); }
+
+  activityUrl(id: number): string {
+    return this.router.serializeUrl(this.router.createUrlTree(['/activities', id]));
+  }
+
+  openActivityInNewTab(id: number): void {
+    window.open(this.activityUrl(id), '_blank', 'noopener');
+  }
 
   get prevPage(): number { return Math.max(1, (this.pagination()?.page ?? 1) - 1); }
   get nextPage(): number {

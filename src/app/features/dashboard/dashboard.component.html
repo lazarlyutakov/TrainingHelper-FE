@@ -99,15 +99,17 @@
         </tr>
       </thead>
       <tbody>
-        @for (a of activities(); track a.stravaActivityId) {
-          <tr class="clickable-row" [routerLink]="['/activities', a.stravaActivityId]">
+        @for (a of activities(); track a.id) {
+          <tr class="clickable-row">
             <td>{{ formatDate(a.startDateUtc) }}</td>
             <td>{{ a.name }}</td>
             <td>{{ a.sportType }}</td>
             <td>{{ km(a.distanceMeters) }}</td>
             <td>{{ minutes(a.movingTimeSeconds) }}</td>
             <td>{{ elevM(a.totalElevationGainMeters) }}</td>
-            <td class="detail-link">View →</td>
+            <td>
+              <a class="view-link" [attr.href]="activityUrl(a.id)" target="_blank" rel="noopener noreferrer">View →</a>
+            </td>
           </tr>
         } @empty {
           <tr><td colspan="7" class="muted">No activities found.</td></tr>

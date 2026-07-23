@@ -121,8 +121,15 @@ tr:hover td { background: #fafafa; }
 /* Clickable activity rows */
 .clickable-row { cursor: pointer; }
 .clickable-row:hover { background: #fff8f5; }
-.clickable-row:hover .detail-link { color: #fc4c02; }
-.detail-link { color: #aaa; font-size: .85rem; white-space: nowrap; }
+.clickable-row:hover .view-link { color: #e04400; }
+.view-link {
+  color: #fc4c02;
+  font-size: .85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.view-link:hover { text-decoration: underline; }
 
 /* ── Filter bar ──────────────────────────────────────────────────────────── */
 .filter-bar {

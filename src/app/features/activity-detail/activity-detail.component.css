@@ -2,9 +2,20 @@
 
 /* ── Header & badge ──────────────────────────────────────────────────────── */
 .detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.badge-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .back-link { color: #fc4c02; text-decoration: none; font-size: .95rem; font-weight: 500; }
 .back-link:hover { text-decoration: underline; }
 .sport-badge { background: #fc4c02; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: .85rem; font-weight: bold; }
+.source-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: .78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+.source-strava { background: #eef6ff; color: #275d9a; border-color: #cfe2ff; }
+.source-gpx { background: #f2f0ff; color: #5a49b6; border-color: #ddd7ff; }
+.source-csv { background: #fff7e8; color: #9b6200; border-color: #ffe0a8; }
 
 .activity-title { font-size: 1.7rem; margin: 0 0 4px; color: #222; }
 .activity-date { margin: 0 0 24px; }
@@ -22,6 +33,18 @@
 .section-header { display: flex; align-items: baseline; gap: 12px; margin-top: 36px; margin-bottom: 10px; }
 .section-header h2 { margin: 0; font-size: 1.1rem; color: #333; }
 .loading-inline { font-size: .85rem; }
+
+.coach-section {
+  margin-top: 24px;
+  padding: 16px 18px;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fff, #fbfbfb);
+}
+.coach-cards { margin-bottom: 14px; }
+.coaching-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.coaching-table th, .coaching-table td { text-align: left; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+.coaching-table th { color: #666; font-weight: 600; width: 180px; }
 
 /* ── Period selector ─────────────────────────────────────────────────────── */
 .period-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
@@ -127,6 +150,8 @@ h2.details-h2 { margin: 8px 0 12px; font-size: 1.1rem; color: #444; }
   flex: 1; padding: 10px 16px; background: #fc4c02; color: #fff;
   border-radius: 8px; text-align: center; text-decoration: none;
   font-size: .9rem; font-weight: 600;
+  border: none;
+  cursor: pointer;
 }
 .btn-primary:hover { background: #e04400; }
 .btn-strava {

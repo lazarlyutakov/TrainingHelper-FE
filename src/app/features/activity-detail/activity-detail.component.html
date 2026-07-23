@@ -10,7 +10,12 @@
 
     <div class="detail-header">
       <a routerLink="/dashboard" class="back-link">← Back to Dashboard</a>
-      <div class="sport-badge">{{ a.sportType }}</div>
+      <div class="badge-row">
+        <div class="sport-badge">{{ a.sportType }}</div>
+        <div class="source-badge source-{{ a.source === 'Strava' ? 'strava' : a.source === 'GpxImport' ? 'gpx' : 'csv' }}">
+          {{ sourceLabel(a.source) }}
+        </div>
+      </div>
     </div>
 
     <h1 class="activity-title">{{ a.name }}</h1>
@@ -35,6 +40,42 @@
         <div class="card-value">{{ pace(a.averageSpeedMetersPerSecond, a.sportType) }}</div>
       </div>
     </div>
+
+    @let coachingData = coaching();
+    @if (coachingLoading()) {
+      <div class="loading-inline">Loading coaching snapshot…</div>
+    } @else if (coachingData) {
+      <section class="section coach-section">
+        <h2>Coaching Snapshot</h2>
+        <div class="cards coach-cards">
+          <div class="card">
+            <div class="card-label">Activity TSS</div>
+            <div class="card-value">{{ round0(coachingData.activityTss) }}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Recent Sample</div>
+            <div class="card-value">{{ coachingData.comparedToRecent.sampleSize }}</div>
+          </div>
+        </div>
+
+        <table class="coaching-table">
+          <tbody>
+            <tr>
+              <th>Distance vs recent</th>
+              <td>{{ coachingData.comparedToRecent.distance }}</td>
+            </tr>
+            <tr>
+              <th>Speed vs recent</th>
+              <td>{{ coachingData.comparedToRecent.speed }}</td>
+            </tr>
+            <tr>
+              <th>Heart rate vs recent</th>
+              <td>{{ coachingData.comparedToRecent.heartRate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    }
 
     <!-- ── Progress comparison section ──────────────────────────────────── -->
     <div class="section-header">
@@ -68,7 +109,7 @@
           <span><span class="dot dot-current"></span> This activity</span>
           <span><span class="dot dot-others"></span> Other activities</span>
           <span><span class="dot dot-trend"></span> Trend</span>
-          <span class="legend-hint">Click any dot to preview that activity</span>
+          <span class="legend-hint">Click any dot to open that activity in a new tab</span>
         </div>
 
         <div class="charts-grid">
@@ -101,7 +142,11 @@
         <tr><th>Max Heart Rate</th><td>{{ a.maxHeartRate != null ? (a.maxHeartRate | number:'1.0-0') + ' bpm' : '—' }}</td></tr>
         <tr><th>Calories</th><td>{{ calories(a.kilojoules) }}</td></tr>
         <tr><th>View on Strava</th><td>
-          <a [attr.href]="stravaLink(a.stravaActivityId)" target="_blank" rel="noopener noreferrer">Open on Strava ↗</a>
+          @if (a.stravaActivityId != null) {
+            <a [attr.href]="stravaLink(a.stravaActivityId)" target="_blank" rel="noopener noreferrer">Open on Strava ↗</a>
+          } @else {
+            —
+          }
         </td></tr>
       </tbody>
     </table>
@@ -160,12 +205,12 @@
         </div>
 
         <div class="modal-actions">
-          <a [routerLink]="['/activities', p.stravaActivityId]" class="btn-primary" (click)="closePopup()">
-            Open full detail →
-          </a>
-          <a [attr.href]="stravaLink(p.stravaActivityId)" target="_blank" rel="noopener noreferrer" class="btn-strava">
-            View on Strava ↗
-          </a>
+          <button class="btn-primary" (click)="openActivityInNewTab(p.id); closePopup()">Open full detail →</button>
+          @if (p.stravaActivityId != null) {
+            <a [attr.href]="stravaLink(p.stravaActivityId)" target="_blank" rel="noopener noreferrer" class="btn-strava">
+              View on Strava ↗
+            </a>
+          }
         </div>
       }
     </div>
