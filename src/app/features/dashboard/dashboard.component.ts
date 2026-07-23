@@ -1,4 +1,5 @@
-﻿import { Component, OnInit, inject, signal } from '@angular/core';
+﻿import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -26,6 +27,7 @@ const SORT_COLUMNS = [
 export class DashboardComponent implements OnInit {
   protected auth = inject(AuthService);
   private api = inject(ApiService);
+  private destroyRef = inject(DestroyRef);
 
   stats = signal<StatsSummary | null>(null);
   activities = signal<Activity[]>([]);
@@ -50,6 +52,13 @@ export class DashboardComponent implements OnInit {
     this.loadStats();
     this.loadActivities(1);
     this.api.getSportTypes().subscribe({ next: t => this.sportTypes.set(t) });
+    this.api.activitiesRefresh$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadStats();
+        this.loadActivities(1);
+        this.api.getSportTypes().subscribe({ next: t => this.sportTypes.set(t) });
+      });
   }
 
   loadStats(): void {

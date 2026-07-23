@@ -22,6 +22,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/coaching/coaching.component').then(m => m.CoachingComponent),
     canActivate: [authGuard]
   },
+  {
+    path: 'import',
+    loadComponent: () => import('./features/import-activities/import-activities.component').then(m => m.ImportActivitiesComponent),
+    canActivate: [authGuard]
+  },
   { path: '**', redirectTo: 'dashboard' }
 ];
 

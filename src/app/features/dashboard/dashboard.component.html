@@ -5,6 +5,7 @@
     <h1>🏃 Training Helper</h1>
     <div class="header-right">
       <a routerLink="/coaching" class="btn-outline">🧠 Training Coach</a>
+      <a routerLink="/import" class="btn-outline">📥 Import Activities</a>
       <span class="muted">Welcome, <strong>{{ auth.currentUser()?.displayName }}</strong></span>
       <button class="btn-outline" (click)="auth.logout()">Log out</button>
     </div>

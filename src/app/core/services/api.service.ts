@@ -1,15 +1,19 @@
 ﻿import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { StatsSummary } from '../models/stats.model';
 import { Activity, ActivitiesResponse, ActivityFilters, ComparisonActivity } from '../models/activity.model';
 import { TrainingAnalysis, PlanFramework } from '../models/training.model';
+import { ImportSummary } from '../models/import.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
   private base = environment.apiUrl;
+  private activitiesRefresh = new Subject<void>();
+
+  readonly activitiesRefresh$ = this.activitiesRefresh.asObservable();
 
   getStats(): Observable<StatsSummary> {
     return this.http.get<StatsSummary>(`${this.base}/api/stats/summary`);
@@ -60,6 +64,24 @@ export class ApiService {
       ? `${this.base}/api/sync/${athleteId}/full`
       : `${this.base}/api/sync/${athleteId}`;
     return this.http.post<{ syncedCount: number; mode: string }>(url, null);
+  }
+
+  importGarminCsv(file: File): Observable<ImportSummary> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ImportSummary>(`${this.base}/api/activities/import-csv`, formData);
+  }
+
+  importGpx(files: File[]): Observable<ImportSummary> {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('files', file);
+    }
+    return this.http.post<ImportSummary>(`${this.base}/api/activities/import-gpx`, formData);
+  }
+
+  requestActivitiesRefresh(): void {
+    this.activitiesRefresh.next();
   }
 }
 

@@ -1,0 +1,221 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  color: #1a1a1a;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-link {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.back-link:hover { color: #333; }
+
+h1 { margin: 0; font-size: 1.6rem; }
+h2 { margin: 0 0 0.4rem; font-size: 1.2rem; }
+h3 { margin: 0 0 0.8rem; font-size: 1.05rem; }
+
+.tab-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 999px;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+.tab-btn:hover { border-color: #fc4c02; color: #fc4c02; }
+.tab-btn.active {
+  border-color: #fc4c02;
+  background: #fc4c02;
+  color: #fff;
+  font-weight: 600;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 1rem 1rem 1.2rem;
+}
+
+.muted { color: #777; font-size: 0.9rem; }
+
+.file-label {
+  display: inline-block;
+  margin: 0.9rem 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+input[type='file'] {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.45rem;
+  background: #fafafa;
+}
+
+.selected-files {
+  margin-top: 0.7rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  color: #333;
+}
+
+.btn {
+  margin-top: 0.2rem;
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: #fc4c02;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) { background: #e04400; }
+.btn:disabled { opacity: 0.6; cursor: default; }
+
+.error-msg {
+  margin-top: 0.65rem;
+  margin-bottom: 0.65rem;
+  color: #c00;
+  background: #fff1f1;
+  border: 1px solid #ffd6d6;
+  border-radius: 6px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.88rem;
+}
+
+.results {
+  margin-top: 1rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 0.6rem;
+}
+
+.summary-card {
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.summary-card span { font-size: 0.78rem; color: #555; text-transform: uppercase; letter-spacing: 0.04em; }
+.summary-card strong { font-size: 1.2rem; }
+
+.summary-card.imported { background: #eefaf0; border-color: #bde8c5; }
+.summary-card.duplicate { background: #fff7eb; border-color: #ffd9a8; }
+.summary-card.skipped { background: #f3f3f3; border-color: #dfdfdf; }
+.summary-card.error { background: #fff0f0; border-color: #ffc6c6; }
+
+.details-block {
+  margin-top: 0.85rem;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  background: #fcfcfc;
+}
+
+.details-block summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.details-list {
+  max-height: 320px;
+  overflow: auto;
+  border-top: 1px solid #eee;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(160px, 1.2fr);
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.84rem;
+}
+.detail-row:last-child { border-bottom: none; }
+
+.detail-main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.detail-index { color: #888; }
+.detail-title {
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-badge {
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.status-imported { background: #def3e4; color: #17672a; }
+.status-duplicate { background: #ffe9cb; color: #8e5a09; }
+.status-skipped { background: #ededed; color: #555; }
+.status-error { background: #ffdede; color: #9f1111; }
+
+.detail-message {
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 760px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  .detail-row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .detail-message,
+  .detail-title {
+    white-space: normal;
+  }
+}

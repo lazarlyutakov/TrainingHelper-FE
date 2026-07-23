@@ -1,0 +1,131 @@
+<div class="page">
+  <div class="header-row">
+    <a routerLink="/dashboard" class="back-link">← Dashboard</a>
+    <h1>📥 Import Activities</h1>
+  </div>
+
+  <div class="tab-row">
+    <button class="tab-btn" [class.active]="activeTab() === 'csv'" (click)="setTab('csv')">
+      Import from Garmin CSV
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'gpx'" (click)="setTab('gpx')">
+      Import GPX file(s)
+    </button>
+  </div>
+
+  @if (activeTab() === 'csv') {
+    <section class="panel">
+      <h2>Garmin CSV Import</h2>
+      <p class="muted">Upload one Garmin Connect Activities export file.</p>
+
+      <label class="file-label" for="csvFile">CSV File</label>
+      <input id="csvFile" type="file" accept=".csv" (change)="onCsvSelected($event)" />
+
+      @if (csvFile()) {
+        <div class="selected-files">
+          <span>{{ csvFile()!.name }}</span>
+        </div>
+      }
+
+      @if (csvValidationError()) {
+        <div class="error-msg">{{ csvValidationError() }}</div>
+      }
+
+      @if (csvRequestError()) {
+        <div class="error-msg">{{ csvRequestError() }}</div>
+      }
+
+      <button class="btn" (click)="importCsv()" [disabled]="csvImporting()">
+        {{ csvImporting() ? 'Importing…' : 'Import CSV' }}
+      </button>
+
+      @if (csvSummary()) {
+        <section class="results">
+          <h3>Import Results</h3>
+          @let summary = csvSummary()!;
+          <div class="summary-grid">
+            <div class="summary-card imported"><span>Imported</span><strong>{{ summary.imported }}</strong></div>
+            <div class="summary-card duplicate"><span>Duplicates</span><strong>{{ summary.duplicates }}</strong></div>
+            <div class="summary-card skipped"><span>Skipped</span><strong>{{ summary.skipped }}</strong></div>
+            <div class="summary-card error"><span>Errors</span><strong>{{ summary.errors }}</strong></div>
+          </div>
+
+          <details class="details-block" [open]="summary.details.length > 0">
+            <summary>View row details ({{ summary.details.length }})</summary>
+            <div class="details-list">
+              @for (row of summary.details; track row.rowNumber + row.title) {
+                <div class="detail-row">
+                  <div class="detail-main">
+                    <span class="detail-index">#{{ row.rowNumber }}</span>
+                    <span class="detail-title">{{ row.title }}</span>
+                  </div>
+                  <span class="status-badge" [class]="'status-badge ' + statusClass(row.status)">{{ row.status }}</span>
+                  <span class="detail-message" [class.muted]="!row.message">{{ row.message ?? 'No details' }}</span>
+                </div>
+              }
+            </div>
+          </details>
+        </section>
+      }
+    </section>
+  }
+
+  @if (activeTab() === 'gpx') {
+    <section class="panel">
+      <h2>GPX Import</h2>
+      <p class="muted">Upload one or many .gpx files in a single import.</p>
+
+      <label class="file-label" for="gpxFiles">GPX Files</label>
+      <input id="gpxFiles" type="file" accept=".gpx" multiple (change)="onGpxSelected($event)" />
+
+      @if (gpxFiles().length > 0) {
+        <div class="selected-files">
+          @for (file of gpxFiles(); track file.name) {
+            <span>{{ file.name }}</span>
+          }
+        </div>
+      }
+
+      @if (gpxValidationError()) {
+        <div class="error-msg">{{ gpxValidationError() }}</div>
+      }
+
+      @if (gpxRequestError()) {
+        <div class="error-msg">{{ gpxRequestError() }}</div>
+      }
+
+      <button class="btn" (click)="importGpx()" [disabled]="gpxImporting()">
+        {{ gpxImporting() ? 'Importing…' : 'Import GPX' }}
+      </button>
+
+      @if (gpxSummary()) {
+        <section class="results">
+          <h3>Import Results</h3>
+          @let summary = gpxSummary()!;
+          <div class="summary-grid">
+            <div class="summary-card imported"><span>Imported</span><strong>{{ summary.imported }}</strong></div>
+            <div class="summary-card duplicate"><span>Duplicates</span><strong>{{ summary.duplicates }}</strong></div>
+            <div class="summary-card skipped"><span>Skipped</span><strong>{{ summary.skipped }}</strong></div>
+            <div class="summary-card error"><span>Errors</span><strong>{{ summary.errors }}</strong></div>
+          </div>
+
+          <details class="details-block" [open]="summary.details.length > 0">
+            <summary>View file details ({{ summary.details.length }})</summary>
+            <div class="details-list">
+              @for (row of summary.details; track row.rowNumber + row.title) {
+                <div class="detail-row">
+                  <div class="detail-main">
+                    <span class="detail-index">#{{ row.rowNumber }}</span>
+                    <span class="detail-title">{{ row.title }}</span>
+                  </div>
+                  <span class="status-badge" [class]="'status-badge ' + statusClass(row.status)">{{ row.status }}</span>
+                  <span class="detail-message" [class.muted]="!row.message">{{ row.message ?? 'No details' }}</span>
+                </div>
+              }
+            </div>
+          </details>
+        </section>
+      }
+    </section>
+  }
+</div>
