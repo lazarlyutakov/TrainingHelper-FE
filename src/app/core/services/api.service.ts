@@ -11,10 +11,23 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
-  private base = environment.apiUrl;
+  private base = this.resolveBaseUrl();
   private activitiesRefresh = new Subject<void>();
 
   readonly activitiesRefresh$ = this.activitiesRefresh.asObservable();
+
+  private resolveBaseUrl(): string {
+    if (environment.apiUrl) {
+      return environment.apiUrl.replace(/\/$/, '');
+    }
+
+    // Render static FE host fallback: call the BE service directly in production.
+    if (environment.production && typeof window !== 'undefined' && window.location.hostname === 'traininghelper-fe.onrender.com') {
+      return 'https://training-helper.onrender.com';
+    }
+
+    return '';
+  }
 
   getStats(): Observable<StatsSummary> {
     return this.http.get<StatsSummary>(`${this.base}/api/stats/summary`);
