@@ -70,11 +70,27 @@
     </div>
     <div class="filter-group">
       <label class="filter-label">From date</label>
-      <input class="filter-input" type="date" [(ngModel)]="filterDateFrom" />
+      <div class="date-field">
+        <input class="filter-input" type="text" placeholder="dd/mm/yyyy" maxlength="10"
+               [value]="displayDate(filterDateFrom)"
+               (change)="filterDateFrom = parseDisplayDate($any($event.target).value)"
+               (keyup.enter)="filterDateFrom = parseDisplayDate($any($event.target).value); applyFilters()" />
+        <button type="button" class="date-picker-btn" title="Pick a date" (click)="openPicker(pickerFrom)">📅</button>
+        <input #pickerFrom class="date-picker-native" type="date" tabindex="-1" aria-hidden="true"
+               [value]="filterDateFrom" (change)="filterDateFrom = $any($event.target).value" />
+      </div>
     </div>
     <div class="filter-group">
       <label class="filter-label">To date</label>
-      <input class="filter-input" type="date" [(ngModel)]="filterDateTo" />
+      <div class="date-field">
+        <input class="filter-input" type="text" placeholder="dd/mm/yyyy" maxlength="10"
+               [value]="displayDate(filterDateTo)"
+               (change)="filterDateTo = parseDisplayDate($any($event.target).value)"
+               (keyup.enter)="filterDateTo = parseDisplayDate($any($event.target).value); applyFilters()" />
+        <button type="button" class="date-picker-btn" title="Pick a date" (click)="openPicker(pickerTo)">📅</button>
+        <input #pickerTo class="date-picker-native" type="date" tabindex="-1" aria-hidden="true"
+               [value]="filterDateTo" (change)="filterDateTo = $any($event.target).value" />
+      </div>
     </div>
     <div class="filter-actions">
       <button class="btn" (click)="applyFilters()">Apply</button>

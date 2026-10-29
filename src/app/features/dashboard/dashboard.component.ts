@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
 import { StatsSummary } from '../../core/models/stats.model';
+import { formatDate, formatDateTime, parseDisplayDate } from '../../core/utils/date-format';
 import { Activity, ActivityFilters, Pagination } from '../../core/models/activity.model';
 
 const SORT_COLUMNS = [
@@ -145,7 +146,15 @@ export class DashboardComponent implements OnInit {
   hours(seconds: number): string { return (seconds / 3600).toFixed(2); }
   minutes(seconds: number): string { return (seconds / 60).toFixed(1); }
   elevM(meters: number): number { return Math.round(meters); }
-  formatDate(iso: string): string { return new Date(iso).toLocaleString(); }
+  formatDate(iso: string): string { return formatDateTime(iso); }
+
+  /** Filter model is yyyy-mm-dd (sent to the API); the text boxes show dd/mm/yyyy. */
+  displayDate(iso: string): string { return iso ? formatDate(iso) : ''; }
+  parseDisplayDate(text: string): string { return parseDisplayDate(text); }
+
+  openPicker(input: HTMLInputElement): void {
+    try { input.showPicker(); } catch { input.focus(); }
+  }
 
   activityUrl(id: number): string {
     return this.router.serializeUrl(this.router.createUrlTree(['/activities', id]));

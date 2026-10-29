@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { TrainingAnalysis, PlanFramework } from '../../core/models/training.model';
+import { formatDate } from '../../core/utils/date-format';
 
 @Component({
   selector: 'app-coaching',
@@ -51,7 +52,7 @@ export class CoachingComponent implements OnInit {
   }
 
   formatDate(iso: string): string {
-    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    return formatDate(iso);
   }
 
   km(m: number): string { return (m / 1000).toFixed(1); }

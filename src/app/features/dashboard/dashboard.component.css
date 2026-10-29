@@ -172,6 +172,30 @@ tr:hover td { background: #fafafa; }
 }
 .filter-input:focus { border-color: #fc4c02; }
 
+/* dd/mm/yyyy text box + button that opens a hidden native date picker */
+.date-field { position: relative; display: flex; align-items: center; }
+.date-field .filter-input { padding-right: 32px; }
+.date-picker-btn {
+  position: absolute;
+  right: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: .95rem;
+  padding: 2px 4px;
+}
+.date-picker-native {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  border: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
 .filter-actions {
   display: flex;
   gap: 8px;

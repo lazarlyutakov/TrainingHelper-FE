@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { Activity, ComparisonActivity } from '../../core/models/activity.model';
+import { formatDate, formatDateTime } from '../../core/utils/date-format';
 import { ActivityCoachingResponse, ActivityDetail } from '../../core/models/activity-detail.model';
 import {
   Chart, LineController, ScatterController,
@@ -348,7 +349,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   }
 
   private shortDate(iso: string): string {
-    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' });
+    return formatDate(iso);
   }
 
   private resolveActivityError(error: unknown): string {
@@ -385,7 +386,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     if (m > 0) return `${m}m ${s}s`;
     return `${s}s`;
   }
-  formatDate(iso: string): string { return new Date(iso).toLocaleString(); }
+  formatDate(iso: string): string { return formatDateTime(iso); }
   calories(kj: number | null): string {
     if (kj == null) return '—';
     return `${Math.round(kj * 0.239006)} kcal (${kj.toFixed(0)} kJ)`;
