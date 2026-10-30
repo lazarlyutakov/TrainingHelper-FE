@@ -28,6 +28,26 @@ export class AuthService {
     );
   }
 
+  /** Username (or email) + password login. On success the session cookie is set and the user is cached. */
+  login(username: string, password: string): Observable<User> {
+    return this.http.post<User>(`${environment.apiUrl}/api/auth/login`, { username, password }).pipe(
+      tap(user => this.setUser(user))
+    );
+  }
+
+  /** Creates a username/password account and signs the new user in. */
+  register(username: string, email: string, password: string): Observable<User> {
+    return this.http.post<User>(`${environment.apiUrl}/api/auth/register`, { username, email, password }).pipe(
+      tap(user => this.setUser(user))
+    );
+  }
+
+  private setUser(user: User): void {
+    this.currentUser.set(user);
+    this.isAuthenticated.set(true);
+    this.isLoading.set(false);
+  }
+
   loginWithStrava(): void {
     window.location.href = `${environment.apiUrl}/auth/strava/start`;
   }
