@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { authErrorMessage } from '../../../core/utils/auth-error';
 
@@ -13,7 +13,6 @@ import { authErrorMessage } from '../../../core/utils/auth-error';
 })
 export class RegisterComponent {
   private auth = inject(AuthService);
-  private router = inject(Router);
 
   username = '';
   email = '';
@@ -22,6 +21,10 @@ export class RegisterComponent {
 
   submitting = signal(false);
   error = signal<string | null>(null);
+  /** Email the confirmation link was sent to; switches the page to the "check your inbox" view. */
+  registeredEmail = signal<string | null>(null);
+  resending = signal(false);
+  resent = signal(false);
 
   register(): void {
     if (this.password !== this.confirmPassword) {
@@ -31,11 +34,28 @@ export class RegisterComponent {
     this.submitting.set(true);
     this.error.set(null);
 
-    // The backend signs the new user in, so go straight to the dashboard.
     this.auth.register(this.username.trim(), this.email.trim(), this.password).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: res => {
+        this.submitting.set(false);
+        this.registeredEmail.set(res.email);
+      },
       error: err => {
         this.submitting.set(false);
+        this.error.set(authErrorMessage(err));
+      }
+    });
+  }
+
+  resend(): void {
+    this.resending.set(true);
+    this.error.set(null);
+    this.auth.resendConfirmation(this.registeredEmail()!).subscribe({
+      next: () => {
+        this.resending.set(false);
+        this.resent.set(true);
+      },
+      error: err => {
+        this.resending.set(false);
         this.error.set(authErrorMessage(err));
       }
     });

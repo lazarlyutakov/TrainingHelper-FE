@@ -11,3 +11,8 @@ export function authErrorMessage(err: unknown): string {
   }
   return 'Something went wrong. Please try again.';
 }
+
+/** The error code (e.g. "email_not_confirmed") of a failed /api/auth request, if any. */
+export function authErrorCode(err: unknown): string | null {
+  return err instanceof HttpErrorResponse ? (err.error as AuthError | null)?.error ?? null : null;
+}

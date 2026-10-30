@@ -4,8 +4,19 @@
     <p class="subtitle">Track your activities and stats in one place.</p>
 
     <form (ngSubmit)="login()">
+      @if (notice()) {
+        <div class="alert alert-success">{{ notice() }}</div>
+      }
       @if (error()) {
-        <div class="alert alert-error">{{ error() }}</div>
+        <div class="alert alert-error">
+          {{ error() }}
+          @if (needsConfirmation()) {
+            <br />
+            <button type="button" class="link-btn" [disabled]="resending()" (click)="resendConfirmation()">
+              {{ resending() ? 'Sending…' : 'Resend confirmation email' }}
+            </button>
+          }
+        </div>
       }
 
       <div class="field">
@@ -17,6 +28,7 @@
         <label for="password">Password</label>
         <input id="password" name="password" type="password" autocomplete="current-password" required
                [(ngModel)]="password" />
+        <a routerLink="/forgot-password" class="field-link">Forgot password?</a>
       </div>
 
       <button type="submit" class="primary-btn" [disabled]="submitting() || !username.trim() || !password">

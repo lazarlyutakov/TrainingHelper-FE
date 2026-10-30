@@ -9,3 +9,12 @@ export interface AuthError {
   message: string;
 }
 
+/** Body of a successful registration — the account must be confirmed via email before logging in. */
+export interface RegisterResponse {
+  email: string;
+}
+
+export interface MessageResponse {
+  message: string;
+}
+
