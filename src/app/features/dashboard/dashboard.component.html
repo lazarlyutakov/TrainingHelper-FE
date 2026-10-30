@@ -11,13 +11,6 @@
     </div>
   </div>
 
-  <!-- Sync controls -->
-  <div class="sync-row">
-    <button class="btn" (click)="sync(false)" [disabled]="syncing()">Sync Data</button>
-    <button class="btn" (click)="sync(true)" [disabled]="syncing()">Full Re-sync</button>
-    <span class="muted">{{ syncStatus() }}</span>
-  </div>
-
   <!-- Summary cards -->
   @let s = stats();
   @if (statsLoading()) {
@@ -43,7 +36,7 @@
             <td>{{ km(item.distanceMeters) }}</td>
           </tr>
         } @empty {
-          <tr><td colspan="3" class="muted">No synced activities yet.</td></tr>
+          <tr><td colspan="3" class="muted">No activities yet. Use Import Activities to add some.</td></tr>
         }
       </tbody>
     </table>

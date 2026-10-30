@@ -73,12 +73,6 @@ export class ApiService {
     return this.http.get<ActivityCoachingResponse>(`${this.base}/api/activities/id/${id}/coaching`, { params });
   }
 
-  sync(athleteId: number, full = false): Observable<{ syncedCount: number; mode: string }> {
-    const url = full
-      ? `${this.base}/api/sync/${athleteId}/full`
-      : `${this.base}/api/sync/${athleteId}`;
-    return this.http.post<{ syncedCount: number; mode: string }>(url, null);
-  }
 
   importGarminCsv(file: File): Observable<ImportSummary> {
     const formData = new FormData();

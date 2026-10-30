@@ -34,8 +34,6 @@ export class DashboardComponent implements OnInit {
   stats = signal<StatsSummary | null>(null);
   activities = signal<Activity[]>([]);
   pagination = signal<Pagination | null>(null);
-  syncStatus = signal<string>('Ready');
-  syncing = signal<boolean>(false);
   statsLoading = signal<boolean>(true);
   activitiesLoading = signal<boolean>(true);
   sportTypes = signal<string[]>([]);
@@ -118,28 +116,6 @@ export class DashboardComponent implements OnInit {
   sortIndicator(column: string): string {
     if (this.sortBy !== column) return '';
     return this.sortDir === 'asc' ? ' ▲' : ' ▼';
-  }
-
-  sync(full: boolean): void {
-    const athleteId = this.auth.currentUser()?.athleteId;
-    if (!athleteId) return;
-    this.syncing.set(true);
-    this.syncStatus.set(full ? 'Full re-syncing...' : 'Syncing...');
-    this.api.sync(athleteId, full).subscribe({
-      next: res => {
-        this.syncStatus.set(`${res.mode} sync loaded ${res.syncedCount} activities.`);
-        this.syncing.set(false);
-        setTimeout(() => {
-          this.loadStats();
-          this.loadActivities(1);
-          this.api.getSportTypes().subscribe({ next: t => this.sportTypes.set(t) });
-        }, 500);
-      },
-      error: () => {
-        this.syncStatus.set('Sync failed.');
-        this.syncing.set(false);
-      }
-    });
   }
 
   km(meters: number): string { return (meters / 1000).toFixed(2); }

@@ -23,13 +23,6 @@ h2 { margin-top: 24px; margin-bottom: 8px; font-size: 1.15rem; }
   gap: 12px;
 }
 
-/* Sync row */
-.sync-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 12px 0 20px;
-}
 
 /* Buttons */
 .btn {
