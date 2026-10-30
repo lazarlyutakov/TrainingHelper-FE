@@ -17,6 +17,12 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    // Must come before 'activities/:id' so "new" isn't treated as an id
+    path: 'activities/new',
+    loadComponent: () => import('./features/add-activity/add-activity.component').then(m => m.AddActivityComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'activities/:id',
     loadComponent: () => import('./features/activity-detail/activity-detail.component').then(m => m.ActivityDetailComponent),
     canActivate: [authGuard]

@@ -1,7 +1,7 @@
 import { Activity } from './activity.model';
 import { TrainingAnalysis } from './training.model';
 
-export type ActivitySource = 'Strava' | 'GpxImport' | 'CsvImport';
+export type ActivitySource = 'Strava' | 'GpxImport' | 'CsvImport' | 'Manual';
 
 export interface ActivityDetail extends Activity {
   stravaActivityId: number | null;

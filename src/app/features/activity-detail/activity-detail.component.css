@@ -16,6 +16,7 @@
 .source-strava { background: #eef6ff; color: #275d9a; border-color: #cfe2ff; }
 .source-gpx { background: #f2f0ff; color: #5a49b6; border-color: #ddd7ff; }
 .source-csv { background: #fff7e8; color: #9b6200; border-color: #ffe0a8; }
+.source-manual { background: #eefaf0; color: #2b7a3d; border-color: #c9ebd1; }
 
 .activity-title { font-size: 1.7rem; margin: 0 0 4px; color: #222; }
 .activity-date { margin: 0 0 24px; }

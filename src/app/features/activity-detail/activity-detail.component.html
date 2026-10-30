@@ -12,7 +12,7 @@
       <a routerLink="/dashboard" class="back-link">← Back to Dashboard</a>
       <div class="badge-row">
         <div class="sport-badge">{{ a.sportType }}</div>
-        <div class="source-badge source-{{ a.source === 'Strava' ? 'strava' : a.source === 'GpxImport' ? 'gpx' : 'csv' }}">
+        <div class="source-badge {{ sourceClass(a.source) }}">
           {{ sourceLabel(a.source) }}
         </div>
       </div>
@@ -136,7 +136,7 @@
         <tr><th>Elapsed Time</th><td>{{ formatDuration(a.elapsedTimeSeconds) }}</td></tr>
         <tr><th>Elevation Gain</th><td>{{ a.totalElevationGainMeters | number:'1.0-0' }} m</td></tr>
         <tr><th>Avg Speed</th><td>{{ speedKmh(a.averageSpeedMetersPerSecond) }} km/h</td></tr>
-        <tr><th>Max Speed</th><td>{{ speedKmh(a.maxSpeedMetersPerSecond) }} km/h</td></tr>
+        <tr><th>Max Speed</th><td>{{ a.maxSpeedMetersPerSecond ? speedKmh(a.maxSpeedMetersPerSecond) + ' km/h' : '—' }}</td></tr>
         <tr><th>Avg Pace</th><td>{{ pace(a.averageSpeedMetersPerSecond, a.sportType) }}</td></tr>
         <tr><th>Avg Heart Rate</th><td>{{ a.averageHeartRate != null ? (a.averageHeartRate | number:'1.0-0') + ' bpm' : '—' }}</td></tr>
         <tr><th>Max Heart Rate</th><td>{{ a.maxHeartRate != null ? (a.maxHeartRate | number:'1.0-0') + ' bpm' : '—' }}</td></tr>

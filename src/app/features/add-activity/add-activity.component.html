@@ -1,0 +1,120 @@
+<div class="page">
+  <div class="header-row">
+    <a routerLink="/dashboard" class="back-link">← Dashboard</a>
+    <h1>➕ Add Activity</h1>
+  </div>
+
+  <form class="panel" (ngSubmit)="submit()" novalidate>
+    @if (errors().length) {
+      <div class="alert-error">
+        @for (e of errors(); track e) { <div>{{ e }}</div> }
+      </div>
+    }
+
+    <h2>Activity</h2>
+    <div class="grid">
+      <div class="field span-2">
+        <label for="name">Name *</label>
+        <input id="name" name="name" type="text" maxlength="300" placeholder="e.g. Morning Run"
+               [ngModel]="name()" (ngModelChange)="name.set($event)" />
+      </div>
+
+      <div class="field">
+        <label for="sportType">Sport type *</label>
+        <input id="sportType" name="sportType" type="text" maxlength="64" list="sportOptions"
+               placeholder="e.g. Run" [ngModel]="sportType()" (ngModelChange)="sportType.set($event)" />
+        <datalist id="sportOptions">
+          @for (s of sportOptions(); track s) { <option [value]="s"></option> }
+        </datalist>
+      </div>
+
+      <div class="field">
+        <label for="date">Date *</label>
+        <div class="date-field">
+          <input id="date" name="date" type="text" placeholder="dd/mm/yyyy" maxlength="10"
+                 [ngModel]="date()" (ngModelChange)="date.set($event)" />
+          <button type="button" class="date-picker-btn" title="Pick a date" (click)="openPicker(picker)">📅</button>
+          <input #picker class="date-picker-native" type="date" tabindex="-1" aria-hidden="true"
+                 [value]="pickerValue()" (change)="onPickerChange($any($event.target).value)" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="startTime">Start time *</label>
+        <input id="startTime" name="startTime" type="text" placeholder="HH:mm" maxlength="5"
+               [ngModel]="startTime()" (ngModelChange)="startTime.set($event)" />
+      </div>
+    </div>
+
+    <h2>Effort</h2>
+    <div class="grid">
+      <div class="field">
+        <label>Moving time *</label>
+        <div class="duration">
+          <input name="movingH" type="number" min="0" placeholder="h" aria-label="Moving time hours"
+                 [ngModel]="movingH()" (ngModelChange)="movingH.set($event)" />
+          <span>:</span>
+          <input name="movingM" type="number" min="0" max="59" placeholder="mm" aria-label="Moving time minutes"
+                 [ngModel]="movingM()" (ngModelChange)="movingM.set($event)" />
+          <span>:</span>
+          <input name="movingS" type="number" min="0" max="59" placeholder="ss" aria-label="Moving time seconds"
+                 [ngModel]="movingS()" (ngModelChange)="movingS.set($event)" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="distanceKm">Distance (km) *</label>
+        <input id="distanceKm" name="distanceKm" type="number" min="0" step="0.01" placeholder="0 if none"
+               [ngModel]="distanceKm()" (ngModelChange)="distanceKm.set($event)" />
+        @if (speedSummary()) { <span class="hint">{{ speedSummary() }}</span> }
+      </div>
+
+      <div class="field">
+        <label for="elevation">Elevation gain (m)</label>
+        <input id="elevation" name="elevation" type="number" min="0" [(ngModel)]="elevationGainM" />
+      </div>
+    </div>
+
+    <h2>Optional details</h2>
+    <div class="grid">
+      <div class="field">
+        <label>Elapsed time</label>
+        <div class="duration">
+          <input name="elapsedH" type="number" min="0" placeholder="h" aria-label="Elapsed time hours" [(ngModel)]="elapsedH" />
+          <span>:</span>
+          <input name="elapsedM" type="number" min="0" max="59" placeholder="mm" aria-label="Elapsed time minutes" [(ngModel)]="elapsedM" />
+          <span>:</span>
+          <input name="elapsedS" type="number" min="0" max="59" placeholder="ss" aria-label="Elapsed time seconds" [(ngModel)]="elapsedS" />
+        </div>
+        <span class="hint">Including stops. Defaults to the moving time.</span>
+      </div>
+
+      <div class="field">
+        <label for="maxSpeed">Max speed (km/h)</label>
+        <input id="maxSpeed" name="maxSpeed" type="number" min="0" step="0.1" [(ngModel)]="maxSpeedKmh" />
+      </div>
+
+      <div class="field">
+        <label for="avgHr">Avg heart rate (bpm)</label>
+        <input id="avgHr" name="avgHr" type="number" min="30" max="250" [(ngModel)]="averageHeartRate" />
+      </div>
+
+      <div class="field">
+        <label for="maxHr">Max heart rate (bpm)</label>
+        <input id="maxHr" name="maxHr" type="number" min="30" max="250" [(ngModel)]="maxHeartRate" />
+      </div>
+
+      <div class="field">
+        <label for="calories">Calories (kcal)</label>
+        <input id="calories" name="calories" type="number" min="0" [(ngModel)]="calories" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <a routerLink="/dashboard" class="btn-outline">Cancel</a>
+      <button type="submit" class="btn-primary" [disabled]="submitting()">
+        {{ submitting() ? 'Saving…' : 'Save activity' }}
+      </button>
+    </div>
+  </form>
+</div>

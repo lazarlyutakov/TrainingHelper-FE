@@ -29,6 +29,21 @@ export interface ActivitiesResponse {
   pagination: Pagination;
 }
 
+/** Body of POST /api/activities (manual entry). Meters, seconds, m/s and kilojoules, like the stored activity. */
+export interface CreateActivityRequest {
+  name: string;
+  sportType: string;
+  startDate: string;            // ISO 8601, UTC
+  movingTimeSeconds: number;
+  elapsedTimeSeconds: number | null;
+  distanceMeters: number;
+  totalElevationGainMeters: number | null;
+  maxSpeedMetersPerSecond: number | null;
+  averageHeartRate: number | null;
+  maxHeartRate: number | null;
+  kilojoules: number | null;
+}
+
 export interface ActivityFilters {
   sportType?: string;
   name?: string;

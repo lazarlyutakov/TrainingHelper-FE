@@ -396,7 +396,15 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   sourceLabel(source: ActivityDetail['source']): string {
     if (source === 'GpxImport') return 'GPX Import';
     if (source === 'CsvImport') return 'CSV Import';
+    if (source === 'Manual') return 'Manual entry';
     return 'Strava';
+  }
+
+  sourceClass(source: ActivityDetail['source']): string {
+    if (source === 'GpxImport') return 'source-gpx';
+    if (source === 'CsvImport') return 'source-csv';
+    if (source === 'Manual') return 'source-manual';
+    return 'source-strava';
   }
 }
 

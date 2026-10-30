@@ -2,7 +2,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { StatsSummary } from '../models/stats.model';
-import { Activity, ActivitiesResponse, ActivityFilters, ComparisonActivity } from '../models/activity.model';
+import { Activity, ActivitiesResponse, ActivityFilters, ComparisonActivity, CreateActivityRequest } from '../models/activity.model';
 import { ActivityCoachingResponse, ActivityDetail } from '../models/activity-detail.model';
 import { TrainingAnalysis, PlanFramework } from '../models/training.model';
 import { ImportSummary } from '../models/activity-import.model';
@@ -46,6 +46,10 @@ export class ApiService {
     if (filters.sortBy)    params = params.set('sortBy', filters.sortBy);
     if (filters.sortDir)   params = params.set('sortDir', filters.sortDir);
     return this.http.get<ActivitiesResponse>(`${this.base}/api/activities`, { params });
+  }
+
+  createActivity(request: CreateActivityRequest): Observable<{ id: number }> {
+    return this.http.post<{ id: number }>(`${this.base}/api/activities`, request);
   }
 
   getActivity(id: number): Observable<ActivityDetail> {
