@@ -39,7 +39,7 @@ export class ApiService {
 
   getActivities(page: number, filters: ActivityFilters = {}): Observable<ActivitiesResponse> {
     let params = new HttpParams().set('take', page.toString());
-    if (filters.sportType) params = params.set('sportType', filters.sportType);
+    for (const s of filters.sportTypes ?? []) params = params.append('sportType', s);
     if (filters.name)      params = params.set('name', filters.name);
     if (filters.dateFrom)  params = params.set('dateFrom', filters.dateFrom);
     if (filters.dateTo)    params = params.set('dateTo', filters.dateTo);

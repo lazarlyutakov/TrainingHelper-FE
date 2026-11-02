@@ -50,12 +50,32 @@
   <div class="filter-bar">
     <div class="filter-group">
       <label class="filter-label">Sport type</label>
-      <select class="filter-input" [(ngModel)]="filterSportType">
-        <option value="">All sports</option>
-        @for (st of sportTypes(); track st) {
-          <option [value]="st">{{ st }}</option>
+      <div class="multi-select">
+        <button type="button" class="filter-input multi-select-btn"
+                [class.has-value]="filterSportTypes().length > 0"
+                [attr.aria-expanded]="sportMenuOpen()" aria-haspopup="listbox"
+                [title]="filterSportTypes().join(', ')"
+                (click)="sportMenuOpen.set(!sportMenuOpen())">
+          <span class="multi-select-text">{{ sportFilterLabel() }}</span>
+          <span class="multi-select-caret">▾</span>
+        </button>
+        @if (sportMenuOpen()) {
+          <div class="multi-select-menu" role="listbox" aria-multiselectable="true">
+            <div class="multi-select-head">
+              <span>{{ filterSportTypes().length }} selected</span>
+              <button type="button" class="link-btn" [disabled]="filterSportTypes().length === 0" (click)="clearSports()">Clear</button>
+            </div>
+            @for (st of sportTypes(); track st) {
+              <label class="multi-select-option">
+                <input type="checkbox" [checked]="isSportSelected(st)" (change)="toggleSport(st)" />
+                {{ st }}
+              </label>
+            } @empty {
+              <div class="multi-select-empty">No sport types yet.</div>
+            }
+          </div>
         }
-      </select>
+      </div>
     </div>
     <div class="filter-group">
       <label class="filter-label">Activity name</label>

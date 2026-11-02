@@ -1,4 +1,4 @@
-﻿import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+﻿import { Component, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -39,7 +39,8 @@ export class DashboardComponent implements OnInit {
   sportTypes = signal<string[]>([]);
 
   // Filter state
-  filterSportType = '';
+  filterSportTypes = signal<string[]>([]);
+  sportMenuOpen = signal(false);
   filterName = '';
   filterDateFrom = '';
   filterDateTo = '';
@@ -72,7 +73,7 @@ export class DashboardComponent implements OnInit {
   loadActivities(page: number): void {
     this.activitiesLoading.set(true);
     const filters: ActivityFilters = {
-      sportType: this.filterSportType || undefined,
+      sportTypes: this.filterSportTypes(),
       name: this.filterName || undefined,
       dateFrom: this.filterDateFrom || undefined,
       dateTo: this.filterDateTo || undefined,
@@ -90,11 +91,13 @@ export class DashboardComponent implements OnInit {
   }
 
   applyFilters(): void {
+    this.sportMenuOpen.set(false);
     this.loadActivities(1);
   }
 
   resetFilters(): void {
-    this.filterSportType = '';
+    this.filterSportTypes.set([]);
+    this.sportMenuOpen.set(false);
     this.filterName = '';
     this.filterDateFrom = '';
     this.filterDateTo = '';
@@ -111,6 +114,41 @@ export class DashboardComponent implements OnInit {
       this.sortDir = 'desc';
     }
     this.loadActivities(this.pagination()?.page ?? 1);
+  }
+
+  // ── Sport type multi-select ───────────────────────────────────────────────
+  /** Button text: "All sports", "Run", "Run, Swim" or "4 sports". */
+  readonly sportFilterLabel = computed(() => {
+    const selected = this.filterSportTypes();
+    if (selected.length === 0) return 'All sports';
+    if (selected.length <= 2) return selected.join(', ');
+    return `${selected.length} sports`;
+  });
+
+  isSportSelected(sport: string): boolean {
+    return this.filterSportTypes().includes(sport);
+  }
+
+  toggleSport(sport: string): void {
+    this.filterSportTypes.update(list =>
+      list.includes(sport) ? list.filter(s => s !== sport) : [...list, sport]);
+  }
+
+  clearSports(): void {
+    this.filterSportTypes.set([]);
+  }
+
+  /** Close the sport menu when clicking anywhere outside it. */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.sportMenuOpen() && !(event.target as HTMLElement).closest('.multi-select')) {
+      this.sportMenuOpen.set(false);
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.sportMenuOpen.set(false);
   }
 
   sortIndicator(column: string): string {

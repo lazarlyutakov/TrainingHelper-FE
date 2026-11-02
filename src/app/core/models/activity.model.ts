@@ -45,7 +45,7 @@ export interface CreateActivityRequest {
 }
 
 export interface ActivityFilters {
-  sportType?: string;
+  sportTypes?: string[];
   name?: string;
   dateFrom?: string;
   dateTo?: string;

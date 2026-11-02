@@ -165,6 +165,69 @@ tr:hover td { background: #fafafa; }
 }
 .filter-input:focus { border-color: #fc4c02; }
 
+/* Sport type multi-select: button + checkbox menu */
+.multi-select { position: relative; }
+.multi-select-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  cursor: pointer;
+  text-align: left;
+  color: #333;
+  font-family: inherit;
+}
+.multi-select-btn.has-value { border-color: #fc4c02; }
+.multi-select-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.multi-select-caret { color: #777; font-size: .8rem; }
+
+.multi-select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  min-width: 220px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.12);
+  padding: 6px 0;
+}
+.multi-select-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 12px 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #eee;
+  font-size: .78rem;
+  color: #777;
+}
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: .88rem;
+  cursor: pointer;
+}
+.multi-select-option:hover { background: #fff4ee; }
+.multi-select-option input { accent-color: #fc4c02; cursor: pointer; }
+.multi-select-empty { padding: 6px 12px; font-size: .85rem; color: #888; }
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #fc4c02;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.link-btn:disabled { color: #bbb; cursor: default; }
+
 /* dd/mm/yyyy text box + button that opens a hidden native date picker */
 .date-field { position: relative; display: flex; align-items: center; }
 .date-field .filter-input { padding-right: 32px; }
