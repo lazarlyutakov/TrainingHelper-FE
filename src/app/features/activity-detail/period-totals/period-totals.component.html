@@ -1,0 +1,79 @@
+<section class="totals-section">
+  <h2>Totals for {{ sportType }}</h2>
+  <p class="totals-intro">Pick a period to see the sum of all your {{ sportType }} activities in it.</p>
+
+  <div class="preset-bar">
+    @for (p of presets; track p.value) {
+      <button type="button" class="preset-btn" [class.active]="activePreset() === p.value" (click)="applyPreset(p.value)">
+        {{ p.label }}
+      </button>
+    }
+  </div>
+
+  <form class="range-bar" (ngSubmit)="calculate()">
+    <div class="range-field">
+      <label for="totalsFrom">From</label>
+      <div class="date-field">
+        <input id="totalsFrom" name="totalsFrom" type="text" placeholder="dd/mm/yyyy" maxlength="10"
+               [ngModel]="from()" (ngModelChange)="setFrom($event)" />
+        <button type="button" class="date-picker-btn" title="Pick a date" (click)="openPicker(pickFrom)">📅</button>
+        <input #pickFrom class="date-picker-native" type="date" tabindex="-1" aria-hidden="true"
+               [value]="pickerValue(from())" (change)="onPicked('from', $any($event.target).value)" />
+      </div>
+    </div>
+    <div class="range-field">
+      <label for="totalsTo">To</label>
+      <div class="date-field">
+        <input id="totalsTo" name="totalsTo" type="text" placeholder="dd/mm/yyyy" maxlength="10"
+               [ngModel]="to()" (ngModelChange)="setTo($event)" />
+        <button type="button" class="date-picker-btn" title="Pick a date" (click)="openPicker(pickTo)">📅</button>
+        <input #pickTo class="date-picker-native" type="date" tabindex="-1" aria-hidden="true"
+               [value]="pickerValue(to())" (change)="onPicked('to', $any($event.target).value)" />
+      </div>
+    </div>
+    <button type="submit" class="calc-btn" [disabled]="loading() || !from() || !to()">
+      {{ loading() ? 'Calculating…' : 'Show totals' }}
+    </button>
+  </form>
+
+  @if (error()) {
+    <div class="totals-error">{{ error() }}</div>
+  }
+
+  @if (totals(); as t) {
+    <p class="totals-range">
+      {{ rangeLabel(t) }} · <strong>{{ t.activityCount }}</strong> {{ t.activityCount === 1 ? 'activity' : 'activities' }}
+    </p>
+
+    @if (t.activityCount === 0) {
+      <p class="totals-empty">No {{ sportType }} activities in this period.</p>
+    } @else {
+      <div class="totals-grid">
+        <div class="total-card">
+          <div class="total-label">Distance</div>
+          <div class="total-value">{{ km(t.totalDistanceMeters) }} <span class="unit">km</span></div>
+        </div>
+        <div class="total-card">
+          <div class="total-label">Elevation Gain</div>
+          <div class="total-value">{{ t.totalElevationGainMeters | number:'1.0-0' }} <span class="unit">m</span></div>
+        </div>
+        <div class="total-card">
+          <div class="total-label">Moving Time</div>
+          <div class="total-value">{{ duration(t.totalMovingTimeSeconds) }}</div>
+        </div>
+        <div class="total-card">
+          <div class="total-label">Calories</div>
+          @if (t.activitiesWithCalories > 0) {
+            <div class="total-value">{{ kcal(t.totalKilojoules) | number:'1.0-0' }} <span class="unit">kcal</span></div>
+            @if (t.activitiesWithCalories < t.activityCount) {
+              <div class="total-note">from {{ t.activitiesWithCalories }} of {{ t.activityCount }} activities</div>
+            }
+          } @else {
+            <div class="total-value">—</div>
+            <div class="total-note">no calorie data</div>
+          }
+        </div>
+      </div>
+    }
+  }
+</section>

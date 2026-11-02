@@ -64,3 +64,16 @@ export interface ComparisonActivity {
   distanceMeters: number;
 }
 
+
+/** Totals for one sport type over a date range (GET /api/activities/totals). */
+export interface ActivityTotals {
+  sportType: string;
+  dateFrom: string;
+  dateTo: string;
+  activityCount: number;
+  totalDistanceMeters: number;
+  totalElevationGainMeters: number;
+  totalMovingTimeSeconds: number;
+  totalKilojoules: number;
+  activitiesWithCalories: number;
+}

@@ -2,7 +2,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { StatsSummary } from '../models/stats.model';
-import { Activity, ActivitiesResponse, ActivityFilters, ComparisonActivity, CreateActivityRequest } from '../models/activity.model';
+import { Activity, ActivitiesResponse, ActivityFilters, ActivityTotals, ComparisonActivity, CreateActivityRequest } from '../models/activity.model';
 import { ActivityCoachingResponse, ActivityDetail } from '../models/activity-detail.model';
 import { TrainingAnalysis, PlanFramework } from '../models/training.model';
 import { ImportSummary } from '../models/activity-import.model';
@@ -61,6 +61,12 @@ export class ApiService {
       `${this.base}/api/activities/comparison`,
       { params: new HttpParams().set('sportType', sportType) }
     );
+  }
+
+  /** dateFrom/dateTo are yyyy-mm-dd, both inclusive. */
+  getActivityTotals(sportType: string, dateFrom: string, dateTo: string): Observable<ActivityTotals> {
+    const params = new HttpParams().set('sportType', sportType).set('dateFrom', dateFrom).set('dateTo', dateTo);
+    return this.http.get<ActivityTotals>(`${this.base}/api/activities/totals`, { params });
   }
 
   getTrainingAnalysis(planWeeks = 8, framework = 'Polarized8020'): Observable<TrainingAnalysis> {

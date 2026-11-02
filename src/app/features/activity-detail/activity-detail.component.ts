@@ -5,6 +5,7 @@ import { ApiService } from '../../core/services/api.service';
 import { Activity, ComparisonActivity } from '../../core/models/activity.model';
 import { formatDate, formatDateTime } from '../../core/utils/date-format';
 import { ActivityCoachingResponse, ActivityDetail } from '../../core/models/activity-detail.model';
+import { PeriodTotalsComponent } from './period-totals/period-totals.component';
 import {
   Chart, LineController, ScatterController,
   LinearScale, PointElement, LineElement,
@@ -30,7 +31,7 @@ export const PERIODS: { label: string; value: Period }[] = [
 @Component({
   selector: 'app-activity-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, PeriodTotalsComponent],
   templateUrl: './activity-detail.component.html',
   styleUrl: './activity-detail.component.css'
 })
