@@ -6,7 +6,7 @@
     <div class="header-right">
       <a routerLink="/coaching" class="btn-outline">🧠 Training Coach</a>
       <a routerLink="/activities/new" class="btn-outline">➕ Add Activity</a>
-      <a routerLink="/import" class="btn-outline">📥 Import Activities</a>
+      <a routerLink="/import" class="btn-outline">📥 Import files</a>
       <span class="muted">Welcome, <strong>{{ auth.currentUser()?.displayName }}</strong></span>
       <button class="btn-outline" (click)="auth.logout()">Log out</button>
     </div>
@@ -37,7 +37,7 @@
             <td>{{ km(item.distanceMeters) }}</td>
           </tr>
         } @empty {
-          <tr><td colspan="3" class="muted">No activities yet. Use Import Activities to add some.</td></tr>
+          <tr><td colspan="3" class="muted">No activities yet. Use Import files to add some.</td></tr>
         }
       </tbody>
     </table>
