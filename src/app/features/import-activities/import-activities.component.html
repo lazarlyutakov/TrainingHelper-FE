@@ -11,7 +11,85 @@
     <button class="tab-btn" [class.active]="activeTab() === 'gpx'" (click)="setTab('gpx')">
       Import GPX file(s)
     </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'health'" (click)="setTab('health')">
+      Health data (HRV, sleep…)
+    </button>
   </div>
+
+  @if (activeTab() === 'health') {
+    <section class="panel">
+      <h2>Garmin Health Data Import</h2>
+      <p class="muted">
+        Upload one or more CSV exports from Garmin Connect: <strong>HRV Status</strong>, <strong>Resting Heart Rate</strong>,
+        <strong>Sleep</strong> and <strong>VO₂ Max</strong>. The file type is detected automatically and re-importing is safe.
+      </p>
+      <p class="muted">
+        Tip: for an accurate daily training readiness, export the <strong>7 Days</strong> or <strong>4 Weeks</strong> view.
+        Longer views (1 Year) contain weekly averages — they're useful for baselines and trends, and never overwrite daily values.
+      </p>
+
+      <label class="file-label" for="healthFiles">CSV Files</label>
+      <input id="healthFiles" type="file" accept=".csv" multiple (change)="onHealthSelected($event)" />
+
+      @if (healthFiles().length > 0) {
+        <div class="selected-files">
+          @for (file of healthFiles(); track file.name) {
+            <span>{{ file.name }}</span>
+          }
+        </div>
+      }
+
+      @if (healthValidationError()) {
+        <div class="error-msg">{{ healthValidationError() }}</div>
+      }
+
+      @if (healthRequestError()) {
+        <div class="error-msg">{{ healthRequestError() }}</div>
+      }
+
+      <button class="btn" (click)="importHealth()" [disabled]="healthImporting()">
+        {{ healthImporting() ? 'Importing…' : 'Import health data' }}
+      </button>
+
+      @if (healthResults(); as results) {
+        <section class="results">
+          <h3>Import Results</h3>
+          @for (file of results; track file.fileName) {
+            <div class="file-result">
+              <h4>
+                {{ file.fileName }}
+                <span class="muted">
+                  — {{ file.kind ?? 'Not recognised' }}{{ file.isAverages ? ' (weekly/monthly averages)' : '' }}
+                </span>
+              </h4>
+              <div class="summary-grid">
+                <div class="summary-card imported"><span>Imported</span><strong>{{ file.summary.imported }}</strong></div>
+                <div class="summary-card duplicate"><span>Unchanged</span><strong>{{ file.summary.duplicates }}</strong></div>
+                <div class="summary-card skipped"><span>Skipped</span><strong>{{ file.summary.skipped }}</strong></div>
+                <div class="summary-card error"><span>Errors</span><strong>{{ file.summary.errors }}</strong></div>
+              </div>
+              <details class="details-block">
+                <summary>View row details ({{ file.summary.details.length }})</summary>
+                <div class="details-list">
+                  @for (row of file.summary.details; track row.rowNumber + row.title) {
+                    <div class="detail-row">
+                      <div class="detail-main">
+                        <span class="detail-index">#{{ row.rowNumber }}</span>
+                        <span class="detail-title">{{ row.title }}</span>
+                      </div>
+                      <span class="status-badge" [class]="'status-badge ' + statusClass(row.status)">{{ row.status }}</span>
+                      <span class="detail-message" [class.muted]="!row.message">{{ row.message ?? 'No details' }}</span>
+                    </div>
+                  }
+                </div>
+              </details>
+            </div>
+          }
+          <a routerLink="/coaching" class="btn btn-link">See your readiness →</a>
+        </section>
+      }
+    </section>
+  }
 
   @if (activeTab() === 'csv') {
     <section class="panel">

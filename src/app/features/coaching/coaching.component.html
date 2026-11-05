@@ -9,21 +9,13 @@
   <!-- Controls -->
   <div class="controls-row">
     <div class="control-group">
-      <label>Framework</label>
-      <select [(ngModel)]="selectedFramework">
-        @for (f of frameworks(); track f.id) {
-          <option [value]="f.id">{{ f.label }}</option>
-        }
-      </select>
-    </div>
-    <div class="control-group">
-      <label>Plan Weeks</label>
-      <select [(ngModel)]="planWeeks">
-        <option [value]="4">4 weeks</option>
-        <option [value]="6">6 weeks</option>
-        <option [value]="8">8 weeks</option>
-        <option [value]="10">10 weeks</option>
-        <option [value]="12">12 weeks</option>
+      <label for="plan-weeks">Plan length</label>
+      <select id="plan-weeks" [(ngModel)]="planWeeks">
+        <option [ngValue]="4">4 weeks</option>
+        <option [ngValue]="6">6 weeks</option>
+        <option [ngValue]="8">8 weeks</option>
+        <option [ngValue]="10">10 weeks</option>
+        <option [ngValue]="12">12 weeks</option>
       </select>
     </div>
     <button class="btn" (click)="loadAnalysis()" [disabled]="loading()">
@@ -38,75 +30,269 @@
   } @else {
     @let a = analysis();
     @if (a) {
+    @let load = a.currentLoad;
+    @let vo2 = a.runningVo2Max;
 
-    <!-- Current Load (PMC) -->
+    @if (load.daysSinceLastActivity != null && load.daysSinceLastActivity > 7) {
+      <div class="stale-banner">
+        ⚠️ Your latest activity is from <strong>{{ formatDate(load.lastActivityDate!) }}</strong>
+        ({{ load.daysSinceLastActivity }} days ago). Import recent activities to get an up-to-date status.
+        <a routerLink="/import">Import activities</a>
+      </div>
+    }
+
+    <!-- Current condition: readiness + health stats -->
+    @let w = a.wellness;
     <section class="section">
-      <h2>📊 Current Load</h2>
-      <div class="cards">
-        <div class="card">
-          <div class="muted">Fitness (CTL)</div>
-          <strong>{{ round0(a.currentLoad.ctl) }}</strong>
+      <h2>Today's Readiness
+        @if (w.latestDate) { <span class="muted">({{ formatDate(w.latestDate) }})</span> }
+      </h2>
+
+      @if (w.readiness.score == null) {
+        <div class="status-card status-none">
+          <div class="status-name">No health data</div>
+          <p class="status-desc">
+            {{ w.readiness.description }}
+            <a routerLink="/import">Import health data</a>
+          </p>
         </div>
-        <div class="card">
-          <div class="muted">Fatigue (ATL)</div>
-          <strong>{{ round0(a.currentLoad.atl) }}</strong>
-        </div>
-        <div class="card" [class]="tsbClass(a.currentLoad.tsb)">
-          <div class="muted">Form (TSB)</div>
-          <strong>{{ round0(a.currentLoad.tsb) }}</strong>
-          <small>{{ a.currentLoad.formLabel }}</small>
-        </div>
-        @if (a.currentLoad.suggestRecoveryWeek) {
-          <div class="card card-warn">
-            <div class="muted">Recommendation</div>
-            <strong>💤 Recovery week suggested</strong>
+      } @else {
+        @if (w.daysSinceLatest != null && w.daysSinceLatest > 2) {
+          <div class="stale-banner">
+            ⚠️ Your latest health data is from <strong>{{ formatDate(w.latestDate!) }}</strong>.
+            <a routerLink="/import">Import fresh exports</a>
           </div>
         }
-      </div>
-    </section>
 
-    <!-- VO2 Trends -->
-    @if (a.vo2Trends.length > 0) {
-      <section class="section">
-        <h2>🫁 VO₂ Trends</h2>
-        <div class="cards">
-          @for (v of a.vo2Trends; track v.sportType) {
-            <div class="card">
-              <div class="muted">{{ v.sportType }}</div>
-              <strong>{{ v.estimatedVo2Max != null ? round1(v.estimatedVo2Max) : '—' }} ml/kg/min</strong>
-              <small>{{ v.trendLabel }}</small>
+        <div class="readiness-row">
+          <div class="readiness-score" [ngClass]="readinessClass(w.readiness.level)">
+            <strong>{{ w.readiness.score }}</strong>
+            <span>{{ w.readiness.level }}</span>
+          </div>
+          <div class="readiness-text">
+            <p class="readiness-rec">{{ w.readiness.recommendation }}</p>
+            <p class="status-desc">{{ w.readiness.description }}</p>
+          </div>
+        </div>
+
+        <div class="factor-list">
+          @for (f of w.readiness.factors; track f.name) {
+            <div class="factor">
+              <div class="factor-head">
+                <span class="factor-name">{{ f.name }}</span>
+                <span class="factor-score">{{ f.score }}</span>
+              </div>
+              <div class="factor-track" role="img" [attr.aria-label]="f.name + ' ' + f.score + ' of 100'">
+                <div class="factor-fill" [style.width.%]="f.score"></div>
+              </div>
+              <small class="muted">{{ f.detail }}</small>
             </div>
           }
         </div>
+      }
+
+      <div class="cards">
+        <div class="card">
+          <div class="muted">HRV status</div>
+          <strong class="big">{{ w.hrv.sevenDayAverage != null ? round0(w.hrv.sevenDayAverage) + ' ms' : '—' }}</strong>
+          <span class="pill" [ngClass]="hrvClass(w.hrv.status)">{{ w.hrv.status }}</span>
+          @if (w.hrv.baselineLow != null) {
+            <small>7-day avg · baseline {{ w.hrv.baselineLow }}–{{ w.hrv.baselineHigh }} ms</small>
+          }
+          @if (w.hrv.lastNight != null) { <small>Last night {{ w.hrv.lastNight }} ms</small> }
+        </div>
+
+        <div class="card">
+          <div class="muted">Resting heart rate</div>
+          <strong class="big">{{ w.restingHr.latest != null ? round0(w.restingHr.latest) + ' bpm' : '—' }}</strong>
+          @if (w.restingHr.baseline != null) {
+            <small>Baseline {{ round0(w.restingHr.baseline) }} bpm ({{ signed(w.restingHr.delta ?? 0) }})</small>
+          }
+          @if (w.restingHr.isAverage) { <small>Weekly average</small> }
+        </div>
+
+        <div class="card">
+          <div class="muted">Sleep score</div>
+          <strong class="big">{{ w.sleep.lastNight != null ? round0(w.sleep.lastNight) : '—' }}</strong>
+          @if (w.sleep.lastNight != null) {
+            <small>{{ w.sleep.quality }}{{ w.sleep.isAverage ? ' · weekly average' : ' · last night' }}</small>
+          }
+          @if (w.sleep.lastNightDurationMinutes != null) { <small>{{ duration(w.sleep.lastNightDurationMinutes) }}</small> }
+          @if (w.sleep.sevenDayAverage != null && !w.sleep.isAverage) {
+            <small>7-day avg {{ round0(w.sleep.sevenDayAverage) }}</small>
+          }
+        </div>
+      </div>
+
+      @if (w.last14Days.length > 0) {
+        <details class="data-table">
+          <summary>Last 14 days</summary>
+          <table>
+            <thead><tr><th>Date</th><th>Resting HR</th><th>HRV</th><th>Sleep</th></tr></thead>
+            <tbody>
+              @for (d of w.last14Days; track d.date) {
+                <tr>
+                  <td>{{ formatDate(d.date) }}</td>
+                  <td>{{ d.restingHeartRate ?? '—' }}</td>
+                  <td>{{ d.hrv != null ? d.hrv + ' ms' : '—' }}</td>
+                  <td>{{ d.sleepScore ?? '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </details>
+      }
+    </section>
+
+    <!-- Training status -->
+    <section class="section">
+      <h2>Training Status</h2>
+      <div class="status-card" [ngClass]="statusClass(load.trainingStatus)">
+        <div class="status-name">{{ load.trainingStatus }}</div>
+        <p class="status-desc">{{ load.trainingStatusDescription }}</p>
+        @if (load.suggestRecoveryWeek) {
+          <p class="status-desc"><strong>💤 A recovery week is recommended.</strong></p>
+        }
+      </div>
+
+      <div class="cards">
+        <!-- VO₂ max -->
+        <div class="card">
+          <div class="muted">Running VO₂ max</div>
+          <strong class="big">{{ vo2.current != null ? round0(vo2.current) : '—' }}</strong>
+          @if (vo2.current != null) {
+            <small>
+              {{ trendArrow(vo2.trendLabel) }} {{ vo2.trendLabel }}
+              @if (vo2.changeLast4Weeks != null) { ({{ signed(vo2.changeLast4Weeks) }} in 4 wks) }
+            </small>
+            <small>{{ vo2.source === 'Garmin' ? 'From Garmin' : 'Estimated from runs' }} · {{ formatDate(vo2.measuredOn!) }}</small>
+          } @else {
+            <small>Needs steady runs of 12+ min with heart rate</small>
+          }
+        </div>
+
+        <!-- Acute load -->
+        <div class="card card-wide">
+          <div class="muted">Acute load (7 days)</div>
+          <strong class="big">{{ round0(load.acuteLoad) }}</strong>
+          @if (load.chronicLoad >= 1) {
+            <div class="gauge" role="img"
+                 [attr.aria-label]="'Acute load ' + round0(load.acuteLoad) + ', optimal range ' + round0(load.optimalAcuteMin) + ' to ' + round0(load.optimalAcuteMax)">
+              <div class="gauge-optimal"
+                   [style.left.%]="gaugePos(load.optimalAcuteMin, load.chronicLoad)"
+                   [style.width.%]="gaugePos(load.optimalAcuteMax, load.chronicLoad) - gaugePos(load.optimalAcuteMin, load.chronicLoad)"></div>
+              <div class="gauge-marker" [style.left.%]="gaugePos(load.acuteLoad, load.chronicLoad)"></div>
+            </div>
+            <small>Optimal {{ round0(load.optimalAcuteMin) }}–{{ round0(load.optimalAcuteMax) }}</small>
+          }
+        </div>
+
+        <!-- Load ratio -->
+        <div class="card">
+          <div class="muted">Load ratio</div>
+          <strong class="big">{{ load.loadRatio != null ? load.loadRatio.toFixed(1) : '—' }}</strong>
+          <span class="pill" [ngClass]="ratioClass(load.loadRatioLabel)">{{ load.loadRatioLabel }}</span>
+          <small>Acute ÷ chronic · optimal 0.8–1.5</small>
+        </div>
+
+        <!-- Chronic load -->
+        <div class="card">
+          <div class="muted">Chronic load (28 days)</div>
+          <strong class="big">{{ round0(load.chronicLoad) }}</strong>
+          <small>Your typical weekly load</small>
+        </div>
+      </div>
+
+      <p class="muted small">
+        Heart rate used: max {{ a.heartRate.maxHr }} bpm{{ a.heartRate.maxHrEstimated ? ' (estimated from your activities)' : '' }},
+        resting {{ a.heartRate.restingHr }} bpm{{ a.heartRate.restingHrEstimated ? ' (assumed)' : '' }}.
+      </p>
+    </section>
+
+    <!-- Weekly load chart -->
+    @let lc = loadChart();
+    @if (lc) {
+      <section class="section">
+        <h2>Weekly Training Load</h2>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch swatch-bar"></span>Weekly load</span>
+          <span class="legend-item"><span class="swatch swatch-line"></span>Chronic load</span>
+        </div>
+        <svg class="chart" [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH" preserveAspectRatio="none"
+             role="img" aria-label="Weekly training load for the last 26 weeks with chronic load line">
+          <line class="grid" x1="0" [attr.x2]="chartW" [attr.y1]="baselineY" [attr.y2]="baselineY" />
+          @for (b of lc.bars; track $index) {
+            <g class="hover-target">
+              <title>{{ b.tooltip }}</title>
+              <rect class="hit" [attr.x]="b.x - 1" y="0" [attr.width]="lc.slot" [attr.height]="baselineY" />
+              @if (b.h > 0) {
+                <rect class="bar" [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h" rx="2" />
+              }
+            </g>
+          }
+          <polyline class="line-chronic" [attr.points]="lc.chronicLine" />
+        </svg>
+        <div class="axis-labels">
+          @for (b of lc.bars; track $index) { <span>{{ b.label }}</span> }
+        </div>
+        <details class="data-table">
+          <summary>Show as table</summary>
+          <table>
+            <thead><tr><th>Week</th><th>Load</th><th>Activities</th><th>Acute</th><th>Chronic</th></tr></thead>
+            <tbody>
+              @for (w of a.weeklyLoad; track w.weekStart) {
+                <tr>
+                  <td>{{ formatDate(w.weekStart) }}</td><td>{{ w.load }}</td><td>{{ w.activityCount }}</td>
+                  <td>{{ w.acuteLoad }}</td><td>{{ w.chronicLoad }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </details>
       </section>
     }
 
-    <!-- Intensity Distribution -->
-    @if (a.intensityDistribution.length > 0) {
+    <!-- Load focus -->
+    @if (a.loadFocus.activitiesAnalyzed > 0) {
+      @let f = a.loadFocus;
       <section class="section">
-        <h2>⚡ Intensity Distribution</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Sport</th>
-              <th>Easy %</th>
-              <th>Moderate %</th>
-              <th>Hard %</th>
-              <th>Activities</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (d of a.intensityDistribution; track d.sportType) {
-              <tr>
-                <td>{{ d.sportType }}</td>
-                <td>{{ round0(d.easyPercent) }}%</td>
-                <td>{{ round0(d.moderatePercent) }}%</td>
-                <td>{{ round0(d.hardPercent) }}%</td>
-                <td>{{ d.activitiesAnalyzed }}</td>
-              </tr>
+        <h2>Load Focus <span class="muted">(last 4 weeks · {{ f.activitiesAnalyzed }} activities)</span></h2>
+        <div class="focus-bar" role="img"
+             [attr.aria-label]="'Low aerobic ' + round0(f.lowAerobicPercent) + '%, high aerobic ' + round0(f.highAerobicPercent) + '%, anaerobic ' + round0(f.anaerobicPercent) + '%'">
+          @if (f.lowAerobicPercent > 0) { <div class="seg seg-low" [style.flex-grow]="f.lowAerobicPercent" [title]="'Low aerobic: ' + f.lowAerobic"></div> }
+          @if (f.highAerobicPercent > 0) { <div class="seg seg-high" [style.flex-grow]="f.highAerobicPercent" [title]="'High aerobic: ' + f.highAerobic"></div> }
+          @if (f.anaerobicPercent > 0) { <div class="seg seg-anaerobic" [style.flex-grow]="f.anaerobicPercent" [title]="'Anaerobic: ' + f.anaerobic"></div> }
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch seg-low"></span>Low aerobic {{ round0(f.lowAerobicPercent) }}% · {{ round0(f.lowAerobic) }}</span>
+          <span class="legend-item"><span class="swatch seg-high"></span>High aerobic {{ round0(f.highAerobicPercent) }}% · {{ round0(f.highAerobic) }}</span>
+          <span class="legend-item"><span class="swatch seg-anaerobic"></span>Anaerobic {{ round0(f.anaerobicPercent) }}% · {{ round0(f.anaerobic) }}</span>
+        </div>
+        <p class="muted small">80/20 target: about 80% of your load low aerobic.</p>
+      </section>
+    }
+
+    <!-- VO₂ max trend -->
+    @let vc = vo2Chart();
+    @if (vc) {
+      <section class="section">
+        <h2>Running VO₂ max — last 12 months</h2>
+        <div class="vo2-chart-wrap">
+          <div class="y-labels"><span>{{ vc.hi }}</span><span>{{ vc.lo }}</span></div>
+          <svg class="chart" [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH" preserveAspectRatio="none"
+               role="img" [attr.aria-label]="'Running VO2 max from ' + vc.first + ' to ' + vc.last">
+            <line class="grid" x1="0" [attr.x2]="chartW" [attr.y1]="baselineY" [attr.y2]="baselineY" />
+            <polyline class="line-vo2" [attr.points]="vc.line" />
+            @for (d of vc.dots; track $index) {
+              <g class="hover-target">
+                <title>{{ d.tooltip }}</title>
+                <circle class="hit" [attr.cx]="d.x" [attr.cy]="d.y" r="10" />
+                <circle class="dot" [attr.cx]="d.x" [attr.cy]="d.y" r="3" />
+              </g>
             }
-          </tbody>
-        </table>
+          </svg>
+        </div>
+        <div class="axis-labels axis-ends"><span>{{ vc.first }}</span><span>{{ vc.last }}</span></div>
       </section>
     }
 
@@ -136,17 +322,20 @@
         <h2>📅 {{ a.suggestedPlan.frameworkLabel }} Plan</h2>
         <p class="plan-goal">{{ a.suggestedPlan.goal }}</p>
         <p class="muted small">{{ formatDate(a.suggestedPlan.planStart) }} – {{ formatDate(a.suggestedPlan.planEnd) }}</p>
+        <ul class="plan-notes">
+          @for (note of a.suggestedPlan.keyInsights; track note) { <li>{{ note }}</li> }
+        </ul>
 
         @for (week of a.suggestedPlan.weeks; track week.weekNumber) {
           <details class="week-block">
             <summary>
               <strong>Week {{ week.weekNumber }}: {{ week.weekLabel }}</strong>
               <span class="muted"> — {{ week.focus }}</span>
-              <span class="week-meta">{{ km(week.totalTargetDistanceMeters) }} km · TSS {{ round0(week.plannedTss) }}</span>
+              <span class="week-meta">{{ km(week.totalTargetDistanceMeters) }} km · load {{ round0(week.plannedLoad) }}</span>
             </summary>
             <table class="workout-table">
               <thead>
-                <tr><th>Date</th><th>Type</th><th>Description</th><th>Dist (km)</th><th>Duration</th><th>Pace</th></tr>
+                <tr><th>Date</th><th>Type</th><th>Description</th><th>Dist (km)</th><th>Duration</th><th>Pace</th><th>Heart rate</th></tr>
               </thead>
               <tbody>
                 @for (w of week.workouts; track w.date + w.type) {
@@ -157,6 +346,7 @@
                     <td>{{ w.targetDistanceMeters != null ? km(w.targetDistanceMeters) : '—' }}</td>
                     <td>{{ w.targetDurationMinutes != null ? w.targetDurationMinutes + ' min' : '—' }}</td>
                     <td>{{ w.paceGuidance ?? '—' }}</td>
+                    <td>{{ w.hrGuidance ?? '—' }}</td>
                   </tr>
                 }
               </tbody>
@@ -170,6 +360,3 @@
   }
 
 </div>
-
-
-

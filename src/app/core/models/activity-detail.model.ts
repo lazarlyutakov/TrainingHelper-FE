@@ -1,5 +1,4 @@
 import { Activity } from './activity.model';
-import { TrainingAnalysis } from './training.model';
 
 export type ActivitySource = 'Strava' | 'GpxImport' | 'CsvImport' | 'Manual';
 
@@ -20,7 +19,9 @@ export interface ComparedToRecent {
 
 export interface ActivityCoachingResponse {
   activity: ActivityDetail;
-  activityTss: number;
+  /** HR-based training load (Garmin-style scale). */
+  activityLoad: number;
+  /** Single-run VO₂ max estimate; null when the activity doesn't qualify. */
+  activityVo2Max: number | null;
   comparedToRecent: ComparedToRecent;
-  trainingAnalysis: TrainingAnalysis;
 }

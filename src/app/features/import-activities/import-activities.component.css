@@ -219,3 +219,7 @@ input[type='file'] {
     white-space: normal;
   }
 }
+
+.file-result { margin-bottom: 1.5rem; }
+.file-result h4 { margin: 0 0 0.6rem; font-size: 0.95rem; }
+.btn-link { display: inline-block; text-decoration: none; margin-top: 0.5rem; }

@@ -4,8 +4,9 @@ import { Observable, Subject } from 'rxjs';
 import { StatsSummary } from '../models/stats.model';
 import { Activity, ActivitiesResponse, ActivityFilters, ActivityTotals, ComparisonActivity, CreateActivityRequest } from '../models/activity.model';
 import { ActivityCoachingResponse, ActivityDetail } from '../models/activity-detail.model';
-import { TrainingAnalysis, PlanFramework } from '../models/training.model';
+import { TrainingAnalysis } from '../models/training.model';
 import { ImportSummary } from '../models/activity-import.model';
+import { WellnessFileImportResult } from '../models/import.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -69,18 +70,13 @@ export class ApiService {
     return this.http.get<ActivityTotals>(`${this.base}/api/activities/totals`, { params });
   }
 
-  getTrainingAnalysis(planWeeks = 8, framework = 'Polarized8020'): Observable<TrainingAnalysis> {
-    const params = new HttpParams().set('planWeeks', planWeeks).set('framework', framework);
+  getTrainingAnalysis(planWeeks = 8): Observable<TrainingAnalysis> {
+    const params = new HttpParams().set('planWeeks', planWeeks);
     return this.http.get<TrainingAnalysis>(`${this.base}/api/training/analysis`, { params });
   }
 
-  getTrainingFrameworks(): Observable<PlanFramework[]> {
-    return this.http.get<PlanFramework[]>(`${this.base}/api/training/frameworks`);
-  }
-
-  getActivityCoaching(id: number, planWeeks = 8, framework = 'Polarized8020'): Observable<ActivityCoachingResponse> {
-    const params = new HttpParams().set('planWeeks', planWeeks).set('framework', framework);
-    return this.http.get<ActivityCoachingResponse>(`${this.base}/api/activities/id/${id}/coaching`, { params });
+  getActivityCoaching(id: number): Observable<ActivityCoachingResponse> {
+    return this.http.get<ActivityCoachingResponse>(`${this.base}/api/activities/id/${id}/coaching`);
   }
 
 
@@ -96,6 +92,14 @@ export class ApiService {
       formData.append('files', file);
     }
     return this.http.post<ImportSummary>(`${this.base}/api/activities/import-gpx`, formData);
+  }
+
+  importWellness(files: File[]): Observable<WellnessFileImportResult[]> {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('files', file);
+    }
+    return this.http.post<WellnessFileImportResult[]>(`${this.base}/api/wellness/import`, formData);
   }
 
   requestActivitiesRefresh(): void {

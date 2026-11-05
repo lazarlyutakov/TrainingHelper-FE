@@ -49,9 +49,15 @@
         <h2>Coaching Snapshot</h2>
         <div class="cards coach-cards">
           <div class="card">
-            <div class="card-label">Activity TSS</div>
-            <div class="card-value">{{ round0(coachingData.activityTss) }}</div>
+            <div class="card-label">Training Load</div>
+            <div class="card-value">{{ round0(coachingData.activityLoad) }}</div>
           </div>
+          @if (coachingData.activityVo2Max != null) {
+            <div class="card">
+              <div class="card-label">Run VO₂ max</div>
+              <div class="card-value">{{ round0(coachingData.activityVo2Max) }}</div>
+            </div>
+          }
           <div class="card">
             <div class="card-label">Recent Sample</div>
             <div class="card-value">{{ coachingData.comparedToRecent.sampleSize }}</div>

@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiService } from '../../core/services/api.service';
-import { ImportSummary, ImportRowResult } from '../../core/models/import.model';
+import { ImportSummary, ImportRowResult, WellnessFileImportResult } from '../../core/models/import.model';
 
-type ImportTab = 'csv' | 'gpx';
+type ImportTab = 'csv' | 'gpx' | 'health';
 
 @Component({
   selector: 'app-import-activities',
@@ -34,8 +34,59 @@ export class ImportActivitiesComponent {
   csvSummary = signal<ImportSummary | null>(null);
   gpxSummary = signal<ImportSummary | null>(null);
 
+  healthFiles = signal<File[]>([]);
+  healthValidationError = signal<string | null>(null);
+  healthRequestError = signal<string | null>(null);
+  healthImporting = signal<boolean>(false);
+  healthResults = signal<WellnessFileImportResult[] | null>(null);
+
   setTab(tab: ImportTab): void {
     this.activeTab.set(tab);
+  }
+
+  onHealthSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    this.healthValidationError.set(null);
+    this.healthRequestError.set(null);
+
+    if (!files || files.length === 0) {
+      this.healthFiles.set([]);
+      return;
+    }
+
+    const selected = Array.from(files);
+    if (selected.some(f => !this.isCsvFile(f))) {
+      this.healthFiles.set([]);
+      this.healthValidationError.set('All files must be .csv exports from Garmin Connect.');
+      return;
+    }
+
+    this.healthFiles.set(selected);
+  }
+
+  importHealth(): void {
+    this.healthValidationError.set(null);
+    this.healthRequestError.set(null);
+    this.healthResults.set(null);
+
+    const files = this.healthFiles();
+    if (files.length === 0) {
+      this.healthValidationError.set('Select at least one .csv file to import.');
+      return;
+    }
+
+    this.healthImporting.set(true);
+    this.api.importWellness(files).subscribe({
+      next: results => {
+        this.healthResults.set(results);
+        this.healthImporting.set(false);
+      },
+      error: err => {
+        this.healthRequestError.set(this.errorMessage(err));
+        this.healthImporting.set(false);
+      }
+    });
   }
 
   onCsvSelected(event: Event): void {
