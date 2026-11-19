@@ -398,6 +398,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     if (source === 'GpxImport') return 'GPX Import';
     if (source === 'CsvImport') return 'CSV Import';
     if (source === 'Manual') return 'Manual entry';
+    if (source === 'GarminConnect') return 'Garmin Connect';
     return 'Strava';
   }
 
@@ -405,6 +406,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     if (source === 'GpxImport') return 'source-gpx';
     if (source === 'CsvImport') return 'source-csv';
     if (source === 'Manual') return 'source-manual';
+    if (source === 'GarminConnect') return 'source-garmin';
     return 'source-strava';
   }
 }

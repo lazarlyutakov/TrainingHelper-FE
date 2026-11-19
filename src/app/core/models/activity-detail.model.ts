@@ -1,6 +1,6 @@
 import { Activity } from './activity.model';
 
-export type ActivitySource = 'Strava' | 'GpxImport' | 'CsvImport' | 'Manual';
+export type ActivitySource = 'Strava' | 'GpxImport' | 'CsvImport' | 'Manual' | 'GarminConnect';
 
 export interface ActivityDetail extends Activity {
   stravaActivityId: number | null;
