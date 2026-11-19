@@ -123,6 +123,19 @@ tr:hover td { background: #fafafa; }
   text-decoration: none;
 }
 .view-link:hover { text-decoration: underline; }
+.row-actions { white-space: nowrap; }
+.delete-btn {
+  margin-left: 12px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #c62828;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.delete-btn:hover:not(:disabled) { text-decoration: underline; }
+.delete-btn:disabled { color: #bbb; cursor: default; }
 
 /* ── Filter bar ──────────────────────────────────────────────────────────── */
 .filter-bar {

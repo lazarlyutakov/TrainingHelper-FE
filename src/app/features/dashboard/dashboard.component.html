@@ -137,7 +137,7 @@
             <td>{{ km(a.distanceMeters) }}</td>
             <td>{{ minutes(a.movingTimeSeconds) }}</td>
             <td>{{ elevM(a.totalElevationGainMeters) }}</td>
-            <td>
+            <td class="row-actions">
               <a
                 class="view-link"
                 [attr.href]="activityUrl(a.id)"
@@ -146,6 +146,13 @@
                 (click)="onViewClick($event, a.id)">
                 View →
               </a>
+              <button
+                type="button"
+                class="delete-btn"
+                [disabled]="deletingId() === a.id"
+                (click)="onDeleteClick($event, a)">
+                {{ deletingId() === a.id ? 'Deleting…' : 'Delete' }}
+              </button>
             </td>
           </tr>
         } @empty {

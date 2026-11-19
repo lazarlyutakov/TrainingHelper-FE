@@ -37,6 +37,7 @@ export class DashboardComponent implements OnInit {
   statsLoading = signal<boolean>(true);
   activitiesLoading = signal<boolean>(true);
   sportTypes = signal<string[]>([]);
+  deletingId = signal<number | null>(null);
 
   // Filter state
   filterSportTypes = signal<string[]>([]);
@@ -182,6 +183,30 @@ export class DashboardComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     this.openActivityInNewTab(id);
+  }
+
+  onDeleteClick(event: MouseEvent, activity: Activity): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.deletingId() !== null) return;
+    if (!confirm(`Delete "${activity.name}"? This cannot be undone.`)) return;
+
+    this.deletingId.set(activity.id);
+    this.api.deleteActivity(activity.id).subscribe({
+      next: () => {
+        this.deletingId.set(null);
+        // Stay on the current page unless it just became empty.
+        const pag = this.pagination();
+        const page = pag && pag.page > 1 && this.activities().length === 1 ? pag.page - 1 : pag?.page ?? 1;
+        this.loadActivities(page);
+        this.loadStats();
+        this.api.getSportTypes().subscribe({ next: t => this.sportTypes.set(t) });
+      },
+      error: () => {
+        this.deletingId.set(null);
+        alert('Could not delete the activity. Please try again.');
+      }
+    });
   }
 
   get prevPage(): number { return Math.max(1, (this.pagination()?.page ?? 1) - 1); }

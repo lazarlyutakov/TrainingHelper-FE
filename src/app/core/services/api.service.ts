@@ -57,6 +57,10 @@ export class ApiService {
     return this.http.get<ActivityDetail>(`${this.base}/api/activities/id/${id}`);
   }
 
+  deleteActivity(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/api/activities/id/${id}`);
+  }
+
   getComparisonActivities(sportType: string): Observable<ComparisonActivity[]> {
     return this.http.get<ComparisonActivity[]>(
       `${this.base}/api/activities/comparison`,
